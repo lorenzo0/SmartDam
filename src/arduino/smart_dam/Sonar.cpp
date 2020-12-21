@@ -17,7 +17,7 @@ float Sonar::tick(){
  * sonar e l'oggetto.
 */
 
-float Sonar:: getDistance(){
+float Sonar::getDistance(){
   
   digitalWrite(pinSonarTrig,LOW);
   delayMicroseconds(3);

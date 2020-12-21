@@ -2,14 +2,17 @@
 #include "Arduino.h"
 #include "MsgService.h"
 
-NormalState::NormalState(int pinLed1){
+NormalState::NormalState(int pinLed1, int pinSonarEcho, int pinSonarTrig){
   this -> pinLed1 = pinLed1;
+  this -> pinSonarEcho = pinSonarEcho;
+  this -> pinSonarTrig = pinSonarTrig;
 }
 
-void NormalState::init(int period){
-  Task::init(period);
+void NormalState::init(int freq){
+  Task::init(freq);
   
   led1 = new Led(pinLed1);
+  sonar = new Sonar(pinSonarEcho, pinSonarTrig);
   Task::setFirstRun(false);
 }
 
@@ -18,17 +21,24 @@ void NormalState::tick(){
   if(!(Task::firstRun)){
     led1 -> switchOff();
     Task::setFirstRun(true);
-    /*Task::setNextTask(3);
-    Task::ts0 = millis();*/
   }
 
-  /*Task::currentTs = millis();
-  
-  if(Task::currentTs - Task::ts0 > SLEEP_TIME){
-    Task::setCompleted(true); 
-    Task::setNextTask(2);
-    Task::setFirstRun(false);
-  }*/
+  checkDistance();
+}
 
-  // qui bisogna fare il get del sonar, se supera i parametri, allora cambia stato
+/* 
+ *  Se il livello dell'acqua è <L1 allora lo stato continua ad essere normale.
+ *  Se il livello invece è >L1 allora lo stato cambierà alla conclusione del tick. 
+ *  Viene dunque settata la task a completed.
+ *  Se il livello è >L1 && >=L2 lo stato passa da uno stato di normalità ad uno stato di allarme.
+*/
+void NormalState::checkDistance(){
+  currentDistance = sonar -> getDistance();
+  if(currentDistance > min_level){
+    if(currentDistance > max_level)
+      Task::setNextTask(2);
+    Task::setNextTask(1);
+    Task::setCompleted(true); 
+    Task::setFirstRun(false);
+  }
 }
