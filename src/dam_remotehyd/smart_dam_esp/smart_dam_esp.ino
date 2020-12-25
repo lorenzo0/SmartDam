@@ -1,3 +1,4 @@
+
 #define SONAR_TRIG 4  //D4
 #define SONAR_ECHO 5  //D3
 #define LED_UNO 16  //D0
@@ -9,11 +10,7 @@
 #include "MsgServiceHTTP.h"
 
 Scheduler scheduler;
-MsgServiceHTTP* connectionHTTP;
-
-char* nameWIFI = "xxxx";
-char* pwdWIFI = "xxxx";
-char* addressWIFI = "xxxxx";
+//MsgServiceHTTP connectionHTTP;
 
 void setup() {
   Serial.begin(9600);
@@ -21,13 +18,12 @@ void setup() {
   pinMode(SONAR_TRIG, OUTPUT);
   pinMode(SONAR_ECHO, INPUT);
 
-  connectionHTTP = new MsgServiceHTTP(nameWIFI, pwdWIFI, addressWIFI);
-  
   scheduler.init();
-  connectionHTTP -> init();
+  MsgService.init();
+  //connectionHTTP.init();
 
   Task* normalState = new NormalState(LED_UNO, SONAR_ECHO, SONAR_TRIG);
-  Task* preAllarmState = new PreAllarmState(LED_UNO, SONAR_ECHO, SONAR_TRIG, connectionHTTP);
+  PreAllarmState* preAllarmState = new PreAllarmState(LED_UNO, SONAR_ECHO, SONAR_TRIG);
   
   normalState -> init();
   preAllarmState -> init();
@@ -36,9 +32,14 @@ void setup() {
   scheduler.addTask(preAllarmState);
 
   scheduler.setIndexCurrentTaskActive(1);
+  preAllarmState -> sendDataHTTP();
 }
 
 void loop() {
   //connectionHTTP -> checkConnection();
   //scheduler.schedule();
+  
+  //MsgService.sendMsg("ciao");
+  //float value = 2.2;
+  //MsgService.sendMsg(value);
 }

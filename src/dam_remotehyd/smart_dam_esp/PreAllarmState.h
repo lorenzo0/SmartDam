@@ -5,13 +5,12 @@
 #include "Led.h"
 #include "Globals.h"
 #include "Sonar.h"
-#include "MsgServiceHTTP.h"
 
 class PreAllarmState: public Task{  
 
 public: 
 
-  PreAllarmState(int pinLed1, int pinSonarEcho, int pinSonarTrig, MsgServiceHTTP* connectionHTTP);
+  PreAllarmState(int pinLed1, int pinSonarEcho, int pinSonarTrig);
   void init();  
   void tick();
   void sendDataHTTP();
@@ -24,7 +23,6 @@ private:
   
   LedImpl* led1;
   Sonar* sonar;
-  MsgServiceHTTP* connectionHTTP;
 
 };
 

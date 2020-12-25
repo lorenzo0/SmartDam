@@ -1,11 +1,7 @@
 #include "Arduino.h"
 #include "MsgServiceHTTP.h"
 
-MsgServiceHTTP::MsgServiceHTTP(char* nameWIFI, char* pwdWIFI, char* addressWIFI){
-  this -> nameWIFI = nameWIFI;
-  this -> pwdWIFI = pwdWIFI;
-  this -> addressWIFI = addressWIFI;
-}
+MsgServiceHTTP MsgService;
 
 void MsgServiceHTTP::init(){
   WiFi.begin(nameWIFI, pwdWIFI);
@@ -20,12 +16,12 @@ void MsgServiceHTTP::init(){
 }
 
 
-void MsgServiceHTTP::sendMsg(String msgToSend){
-  if (WiFi.status()== WL_CONNECTED){ 
+void MsgServiceHTTP::sendMsg(const float& value){
+  if (WiFi.status()== WL_CONNECTED){
+     HTTPClient http;
      http.begin(String(addressWIFI) + "/api/data");      
      http.addHeader("Content-Type", "application/json");     
-     String msg = 
-      String("{ \"value\": ") + String(msgToSend) + ", \"place\": home\" }";
+     String msg = String("{ \"value\": ") + String(value) + ", \"place\": \"" + place +"\" }";
      int retCode = http.POST(msg);   
      http.end();  
 
@@ -34,6 +30,7 @@ void MsgServiceHTTP::sendMsg(String msgToSend){
      } else {
        Serial.println("Message-Not-Sent!");
      }
+     delay(5000); 
   }else{
     Serial.println("Error in WiFi connection");
   }

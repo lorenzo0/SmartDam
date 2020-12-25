@@ -1,11 +1,11 @@
 #include "PreAllarmState.h"
 #include "Arduino.h"
+#include "MsgServiceHTTP.h"
 
-PreAllarmState::PreAllarmState(int pinLed1, int pinSonarEcho, int pinSonarTrig, MsgServiceHTTP* connectionHTTP){
+PreAllarmState::PreAllarmState(int pinLed1, int pinSonarEcho, int pinSonarTrig){
   this -> pinLed1 = pinLed1;
   this -> pinSonarEcho = pinSonarEcho;
   this -> pinSonarTrig = pinSonarTrig;
-  this -> connectionHTTP = connectionHTTP;
 }
 
 void PreAllarmState::init(){
@@ -43,7 +43,6 @@ void PreAllarmState::tick(){
 */
 
 void PreAllarmState::sendDataHTTP(){
-  Serial.println();
-  //connectionHTTP -> checkConnection();
-  //connectionHTTP.sendMsg(msg);
+  float value = 2.2;
+  MsgService.sendMsg(value);
 }
