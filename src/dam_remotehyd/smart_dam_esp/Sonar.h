@@ -6,7 +6,6 @@ class Sonar{
 public: 
 
   Sonar(int pinSonarEcho, int pinSonarTrig);
-  float tick();
   float getDistance();
 
 private:

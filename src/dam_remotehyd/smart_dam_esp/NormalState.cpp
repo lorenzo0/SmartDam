@@ -1,15 +1,18 @@
 #include "NormalState.h"
 #include "Arduino.h"
-#include "MsgService.h"
+#include "MsgServiceHTTP.h"
 
-NormalState::NormalState(int pinLed1){
+NormalState::NormalState(int pinLed1, int pinSonarEcho, int pinSonarTrig){
   this -> pinLed1 = pinLed1;
+  this -> pinSonarEcho = pinSonarEcho;
+  this -> pinSonarTrig = pinSonarTrig;
 }
 
-void NormalState::init(int freq){
-  Task::init(freq);
+void NormalState::init(){
+  Task::init();
   
   led1 = new Led(pinLed1);
+  sonar = new Sonar(pinSonarEcho, pinSonarTrig);
   Task::setFirstRun(false);
 }
 
@@ -20,7 +23,7 @@ void NormalState::tick(){
     Task::setFirstRun(true);
   }
 
-  //checkDistance(); ci sarà un get da esp
+  checkDistance();
 }
 
 /* 
@@ -30,13 +33,14 @@ void NormalState::tick(){
  *  Se il livello è >L1 && >=L2 lo stato passa da uno stato di normalità ad uno stato di allarme.
 */
 
-/*void NormalState::checkDistance(){
+void NormalState::checkDistance(){
+  //sonar restituisce 0, toCheck!
   currentDistance = sonar -> getDistance();
   if(currentDistance > min_level){
+    Task::setNextTask(1);
     if(currentDistance > max_level)
       Task::setNextTask(2);
-    Task::setNextTask(1);
     Task::setCompleted(true); 
     Task::setFirstRun(false);
-  } anche qui verrà gestito da esp
-}*/
+  } 
+}

@@ -1,4 +1,4 @@
-/*
+ /*
  * AVVISO PER MODIFICARE LE COSTANTI RICHIESTE IN SPECIFICA.
  * 
  * Per modificare la minima e massima frequenza (in Hz) è necessario accedere alla classe Potentiometer.h
@@ -8,9 +8,16 @@
  *    - ERROR_TIME in ErrorTask.h
 */
 
-#define LED_UNO 3
-#define HC_RX 0
-#define HC_TX 1
+/*
+ *  BT module connection:  
+ *  - RX is pin 2 => to be connected to TXD of BT module
+ *  - TX is pin 3 => to be connected to RXD of BT module
+ *
+ */ 
+
+#define LED_UNO 10
+#define HC_RX 2
+#define HC_TX 3
 /*#define SERVO_MOTOR 9*/
 /* Grazie a softwareSerial è possibile instaurare una comunicazione di tipo seriale ASINCRONO
 con qualsiasi coppia di pin digitali
@@ -19,15 +26,15 @@ rdx di arduino comunica con tdx di hc-06*/
 
 #define CALIBRATION_TIME_SEC 10
 #include "Scheduler.h"
-#include "NormalState.h"
 #include "MsgService.h"
 #include "servo_motor_impl.h"
 #include "Globals.h"
+#include "MsgServiceBT.h"
 #include <SoftwareSerial.h>
 
 Scheduler scheduler;
 ServoMotor* pMotor;
-SoftwareSerial bluetooth(HC_RX, HC_TX);
+MsgServiceBT msgService(HC_RX, HC_TX);
 String bluethoot_message;
 
 /* 
@@ -43,7 +50,10 @@ void setup(){
   pinMode(LED_UNO,OUTPUT);
 
   Serial.begin(9600);
-  bluetooth.begin(9600);
+  msgService.init();  
+
+  while (!Serial){}
+  Serial.println("ready to go."); 
   
   /*pMotor = new ServoMotorImpl(9);
   
@@ -63,17 +73,15 @@ void setup(){
   delay(200);*/
 
   
-  Task* normalState = new NormalState(LED_UNO);
-  
-  scheduler.init(50);
+  scheduler.init();
   MsgService.init();
 
   /* Nel normalState, la rilevazione viene effettuata una volta ogni 10 secondi*/
-  normalState -> init(min_freq);
+  //normalState -> init();
 
-  scheduler.setIndexCurrentTaskActive(0);
+  //scheduler.setIndexCurrentTaskActive(0);
 
-  scheduler.addTask(normalState);
+  //scheduler.addTask(normalState);
 
 }
 
@@ -82,41 +90,18 @@ void loop() {
   bluethoot_conversation();
 }
 
+/* WORKING */
 void bluethoot_conversation(){
-  /*while(bluetooth.available()){
-    bluethoot_message+=char(bluetooth.read());
-    Serial.println("While: ");
-    Serial.println(bluethoot_message);
-  }
-  if(!bluetooth.available())
-  {
-    if(bluethoot_message!="")
-    {
-      if(bluethoot_message == "H"){
-          digitalWrite(LED_UNO, HIGH);
-          Serial.println("Led ON"); //show the data
-          delay(20);
-          bluethoot_message=""; //clear the data
-       }
-       else if(bluethoot_message == "L"){
-          digitalWrite(LED_UNO, LOW);
-          Serial.println("Led OFF"); //show the data
-          delay(20);
-          bluethoot_message=""; //clear the data
-       }
-       Serial.println("IF: ");
-       Serial.println(bluethoot_message);
-    }
-  }*/
+   if (msgService.isMsgAvailable()) {
+    MsgBT* MsgReceivedBT = msgService.receiveMsg();
+    Serial.println(MsgReceivedBT->getContent()); 
 
-  char c = Serial.read();
-  if (c == 'H')
-  {
-    digitalWrite(LED_UNO, HIGH);
+    if(MsgReceivedBT->getContent() == "H")
+      digitalWrite(LED_UNO, HIGH);
+    else if(MsgReceivedBT->getContent() == "L")
+      digitalWrite(LED_UNO, LOW);
+      //msgService.sendMsg(Msg("pong")); Può essere utilizzato per inviare messaggi al mobile
+       
+    delete MsgReceivedBT;
   }
-  if (c == 'L')
-  {
-    digitalWrite(LED_UNO, LOW);
-  }
-
 }

@@ -6,11 +6,6 @@ Sonar::Sonar(int pinSonarEcho, int pinSonarTrig){
   this->pinSonarTrig = pinSonarTrig;
 }
 
-float Sonar::tick(){
-  float distance = getDistance();
-  return distance;
-}
-
 /* 
  * Avendo il sensore di temperatura, possiamo calcolare la velocità del suono.
  * Sfruttiamo quest'ultima nella formula con la quale viene definita la distanza tra il
@@ -20,14 +15,13 @@ float Sonar::tick(){
 float Sonar::getDistance(){
   
   digitalWrite(pinSonarTrig,LOW);
-  delayMicroseconds(3);
+  delayMicroseconds(2);
   digitalWrite(pinSonarTrig,HIGH);
-  delayMicroseconds(5);
+  delayMicroseconds(10);
   digitalWrite(pinSonarTrig,LOW);
   
-  long tUS = pulseInLong(pinSonarEcho, HIGH);
-
-  double t = tUS / 1000.0 / 1000.0 / 2;
-  double d = t*vs;
-  return d;
+  long tUS = pulseIn(pinSonarEcho, HIGH);
+  
+  double t = tUS*0.034/2;
+  return t;
 }

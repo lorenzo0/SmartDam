@@ -1,0 +1,5 @@
+Avviare ngrok su porta 80
+java->modulo4.1->RunService.java
+Modificare porta da 8080 ad 80
+Avviare RunService.java
+Run Smart_dam_esp (ancora da implementare invio)..

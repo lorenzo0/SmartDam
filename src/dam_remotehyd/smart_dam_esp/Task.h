@@ -20,7 +20,7 @@ public:
    * nameNextTask è la variabile int che permette allo scheduler di mandare in esecuzione la task richiesta.
   */
   
-  long ts0;
+  long ts0, currentTs;
   boolean firstRun;
   int nameNextTask;
   
