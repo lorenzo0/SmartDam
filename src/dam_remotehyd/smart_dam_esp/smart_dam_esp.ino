@@ -5,6 +5,7 @@
 #include "Sonar.h"
 #include "MsgServiceHTTP.h"
 #include "Globals.h"
+#include "Led.h"
 
 /*#include <iostream>
 #include <string>
@@ -28,18 +29,20 @@ void setup() {
 
   MsgService.init();
   led -> switchOff();
+
+  float value = 2.2;
+  MsgService.sendMsg(value);
 }
 
 void loop() {
   ts0 = millis();
   //checkState();
-  state = "PRE-ALLARM";
-  executeState();
+  //state = "PRE-ALLARM";
+  //executeState();
 
   /* sonar -> getDistance();*/
   
-  /*float value = 2.2;
-  MsgService.sendMsg(value);*/
+  
 }
 
 
