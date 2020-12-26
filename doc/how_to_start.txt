@@ -1,0 +1,9 @@
+bisogna menzionare il fatto che esp non supporta l'uso di uno scheduler. 
+
+Ogni 2.5 secondi, se ESP non ha il controllo dell'applicazione (ma questa viene, per esempio, gestita da uno scheduler) il watchdog timer identifica questa come un'interruzione prolungata, quindi riavvia il microprocessore, interrompendo la sua esecuzione.
+
+Per questo motivo, è stato deciso di gestire i diversi stati (interpretati come task) su microcontrollore ARDUINO UNO.
+
+- Inserire immagine watchdog timer 
+
+Esp quindi si occuperà di inviare, via http, i valori del sonar e non di gestirli (arduino uno + server).

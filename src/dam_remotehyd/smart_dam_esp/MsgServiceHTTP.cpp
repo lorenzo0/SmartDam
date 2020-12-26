@@ -15,7 +15,7 @@ void MsgServiceHTTP::init(){
   Serial.println("Connected to WIFI: "+ String(nameWIFI));
 }
 
-
+//deve essere const String& value
 void MsgServiceHTTP::sendMsg(const float& value){
   if (WiFi.status()== WL_CONNECTED){
      HTTPClient http;

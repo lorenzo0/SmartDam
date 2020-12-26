@@ -8,7 +8,7 @@ const double max_dist = 40;
 /*1 volta ogni 10 secondi*/
 const int min_freq = 10000;
 /*1 volta ogni 5 secondi*/
-const int max_freq = 5;
+const int max_freq = 5000;
 const int num_ril = 20;
 
 #endif

@@ -1,9 +1,7 @@
 #include "Scheduler.h"
-#include "MsgService.h"
-#include <TimerOne.h>
+#include "MsgServiceHTTP.h"
 
 void Scheduler::init(){
-  Timer1.initialize(period);
   nTasks = 0;
   i = 0;
   indexCurrentTaskActive = 0;
@@ -66,15 +64,15 @@ void Scheduler::redirectTask(int nextState){
   switch(nextState){
     case 0:
       setIndexCurrentTaskActive(0);
-      MsgService.sendMsg("NORMAL");
+      //MsgService.sendMsg("NORMAL");
       break;
     case 1:
       setIndexCurrentTaskActive(1);
-      MsgService.sendMsg("PRE-ALLARM");
+      //MsgService.sendMsg("PRE-ALLARM");
       break;
      case 2:
       setIndexCurrentTaskActive(2);
-      MsgService.sendMsg("ALLARM");
+      //MsgService.sendMsg("ALLARM");
       break;
   }
 }
