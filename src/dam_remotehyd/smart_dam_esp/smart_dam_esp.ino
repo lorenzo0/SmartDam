@@ -31,6 +31,7 @@ void setup() {
   led -> switchOff();
 
   float value = 2.2;
+  Serial.println("ci sono!");
   MsgService.sendMsg(value);
 }
 
@@ -93,7 +94,7 @@ void checkState(){
   //float es = str2float(state);
   //float es = strtod(state,NULL);
   
-  MsgService.sendMsg(stateTemp);
+  //MsgService.sendMsg(stateTemp);
   //executeState();
 }
 
@@ -128,6 +129,10 @@ void executeState(){
       ts0 = millis();
   }else if(state == "NORMAL")
       led -> switchOff();
+}
+
+void calculateOpeningDam(){
+  
 }
 
 
