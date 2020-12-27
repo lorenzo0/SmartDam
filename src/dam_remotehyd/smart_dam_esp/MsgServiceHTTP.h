@@ -21,9 +21,9 @@ public:
 
 private:
 
-char* nameWIFI = "xxxx";
-char* pwdWIFI = "xxxx";
-char* addressWIFI = "xxxx";
+char* nameWIFI = "Wind3 HUB-7C4FA6";
+char* pwdWIFI = "CasaPisano!!";
+char* addressWIFI = "http://aa24c845bba8.ngrok.io";
 
 };
 

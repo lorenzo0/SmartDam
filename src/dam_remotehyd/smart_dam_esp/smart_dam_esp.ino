@@ -28,7 +28,7 @@ void setup() {
 
   /* Fase di testing */
   float value = 2.233333333;
-  state = "PRE-ALLARM";
+  state = "ALLARM";
   MsgService.sendMsg(value, state);
 }
 
