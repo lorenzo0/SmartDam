@@ -24,7 +24,7 @@ private:
 
 char* nameWIFI = "Wind3 HUB-7C4FA6";
 char* pwdWIFI = "CasaPisano!!";
-char* addressWIFI = "http://daaab9786c3a.ngrok.io";
+char* addressWIFI = "http://aa24c845bba8.ngrok.io";
 
 String state = "ALLARM";
 };
