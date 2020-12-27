@@ -7,10 +7,6 @@
 #include "Globals.h"
 #include "Led.h"
 
-/*#include <iostream>
-#include <string>
-#include <stdlib.h>*/
-
 Sonar* sonar;
 Led* led;
 long currentTs, ts0;
@@ -30,20 +26,16 @@ void setup() {
   MsgService.init();
   led -> switchOff();
 
-  float value = 2.2;
-  Serial.println("ci sono!");
-  MsgService.sendMsg(value);
+  /* Fase di testing */
+  float value = 2.233333333;
+  state = "PRE-ALLARM";
+  MsgService.sendMsg(value, state);
 }
 
 void loop() {
-  ts0 = millis();
+  //ts0 = millis();
   //checkState();
-  //state = "PRE-ALLARM";
-  //executeState();
-
-  /* sonar -> getDistance();*/
-  
-  
+  //executeState();  
 }
 
 
@@ -53,46 +45,18 @@ void loop() {
  *  Viene dunque settata la task a completed.
  *  Se il livello è >L1 && >=L2 lo stato passa da uno stato di normalità ad uno stato di allarme.
  *  
- *  ----------------------------------------------------
- *  
- *  E' NECESSARIO CAMBIARE IL PROTOCOLLO DI RICEZIONE IN ECLIPSE
- *  Voglio inviare dei dati in stringhe che riportano lo stato corrente in base allo stato del sonar
- *  
- *  In Java ora Value (nella richiesta HTTP) ha valore Float --> String!!  
- *  
- *  Forse no... Riusciamo a fare due diversi pattern per i messaggi in entrata?
- *    1. value in float
- *    2. value in string
- *    
- *  Intanto, sono stati presi in esame dei valori sostituitivi alle stringhe per definire lo stato corrente.
- *  Valore min e max per float 1.17549e-038 ** 3.40282e+038
- *  100000.1 --> Stato NORMAL
- *  100000.2 --> Stato PRE-ALLARM
- *  100000.3 --> Stato ALLARM
- *  
- *  state = "PRE-ALLARM";
- *  state = "ALLARM";
- *  
- *  -----------------------------------------------------
 */
 
 void checkState(){
   //sonar restituisce 0, toCheck!
   currentDistance = sonar -> getDistance();
   if(currentDistance > min_level){
-    stateTemp = 100000.2;
     state = "PRE-ALLARM";
-    if(currentDistance > max_level){
-      stateTemp = 100000.3;
+    if(currentDistance > max_level)
       state = "ALLARM";
-    }
-  }else if(currentDistance < min_level){
-    stateTemp = 100000.1;
+  }else if(currentDistance < min_level)
     state = "NORMAL";
-  }
-
-  //float es = str2float(state);
-  //float es = strtod(state,NULL);
+  
   
   //MsgService.sendMsg(stateTemp);
   //executeState();

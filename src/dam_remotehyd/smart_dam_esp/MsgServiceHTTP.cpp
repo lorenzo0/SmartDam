@@ -15,12 +15,12 @@ void MsgServiceHTTP::init(){
   Serial.println("Connected to WIFI: "+ String(nameWIFI));
 }
 
-void MsgServiceHTTP::sendMsg(const float& value){
+void MsgServiceHTTP::sendMsg(const float& value, const String& state){
   if (WiFi.status()== WL_CONNECTED){
      HTTPClient http;
      http.begin(String(addressWIFI) + "/api/data");      
      http.addHeader("Content-Type", "application/json");     
-     String msg = String("{ \"distance\": ") + String(value) + ", \"place\": \"" + state +"\" }";
+     String msg = String("{ \"distance\": ") + String(value) + ", \"state\": \"" + state +"\" }";
      int retCode = http.POST(msg);   
      http.end();  
 

@@ -16,17 +16,15 @@ class MsgServiceHTTP{
 public: 
 
   void init();
-  //deve essere const String& value
-  void sendMsg(const float& value);
+  void sendMsg(const float& value, const String& state);
   void checkConnection();
 
 private:
 
-char* nameWIFI = "Wind3 HUB-7C4FA6";
-char* pwdWIFI = "CasaPisano!!";
-char* addressWIFI = "http://aa24c845bba8.ngrok.io";
+char* nameWIFI = "xxxx";
+char* pwdWIFI = "xxxx";
+char* addressWIFI = "xxxx";
 
-String state = "ALLARM";
 };
 
 extern MsgServiceHTTP MsgService;
