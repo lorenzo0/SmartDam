@@ -1,0 +1,34 @@
+ESP comunica al serfver il valore del sonar
+	- Distanza 
+	- Timestamp	
+	- Stato
+	- Apertura diga
+
+Arduino legge i dati del server
+	- Dato lo stato, modifica il comportamento del suo led
+	- Data l'apertura della diga, modifica l'angolo del servomotore
+
+Arduino legge i dati da bluethoot
+	- Modifica l'apertura della diga
+	- Appena fatto, invia queste informazioni tramite seriale
+		- Distanza 
+		- Timestamp	
+		- Stato
+		- Apertura diga (M)
+
+APP legge i dati del server
+	- modifica i valori della sua interfaccia
+		- Stato
+		- Apertura diga
+		- TimeStamp
+		- Distanza (con massimali in rosso/giallo)
+
+APP quando è in stato modifica, invia dati al server
+	- Avendo l'ultimo valore dato dal server, lo modifica
+	- Una volta modificato, invia dati a bluethoot
+
+Dasnboard legge i dati del server e stampa
+	- Distanza 
+	- Timestamp	
+	- Stato
+	- Apertura diga
