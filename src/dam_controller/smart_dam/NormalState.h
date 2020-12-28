@@ -4,13 +4,12 @@
 #include "Task.h"
 #include "Led.h"
 #include "Globals.h"
-#include "Sonar.h"
 
 class NormalState: public Task{  
 
 public: 
 
-  NormalState(int pinLed1, int pinSonarEcho, int pinSonarTrig);
+  NormalState(int pinLed1);
   void init();  
   void tick();
   void checkDistance();
@@ -18,13 +17,9 @@ public:
 private:
 
   int pinLed1;
-  int pinSonar;
-  int pinSonarEcho;
-  int pinSonarTrig;
   double currentDistance;
   
   LedImpl* led1;
-  Sonar* sonar;
 
 };
 

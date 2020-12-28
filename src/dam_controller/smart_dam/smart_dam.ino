@@ -96,10 +96,10 @@ void bluethoot_conversation(){
     MsgBT* MsgReceivedBT = msgService.receiveMsg();
     Serial.println(MsgReceivedBT->getContent()); 
 
-    if(MsgReceivedBT->getContent() == "H")
+    /*if(MsgReceivedBT->getContent() == "H")
       digitalWrite(LED_UNO, HIGH);
     else if(MsgReceivedBT->getContent() == "L")
-      digitalWrite(LED_UNO, LOW);
+      digitalWrite(LED_UNO, LOW);*/
       //msgService.sendMsg(Msg("pong")); Può essere utilizzato per inviare messaggi al mobile
        
     delete MsgReceivedBT;

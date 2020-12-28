@@ -20,12 +20,14 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -48,9 +50,11 @@ public class UserInterface extends AppCompatActivity {
     Switch modalitySwitch;
     Spinner spinner;
     boolean checkOnCreate;
-    String currentState, currentLevel;
+    String currentState;
+    Float currentLevel;
     List<String> spinnerArray = null;
     Bluetooth bluetoothConn;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,24 +122,11 @@ public class UserInterface extends AppCompatActivity {
                 }
             }
         });
-
-        //tryHttpGet();
-
-        /*findViewById(R.id.postBtn).setOnClickListener(v -> {
-            try {
-                tryHttpPost();
-            } catch (JSONException e) {vvv
-                e.printStackTrace();
-            }
-        });*/
     }
 
     private void tryHttpGet(){
 
-        //final String url = "http://dummy.restapiexample.com/api/v1/employee/1";
-        final String url = "http://0762885e0a53.ngrok.io/api/data";
-
-        Http.get(url, response -> {
+        Http.get(global.url, response -> {
             if(response.code() == HttpURLConnection.HTTP_OK){
                 try {
                     //JSONObject jsonObject = new JSONObject(response.contentAsString()); //Here reponse is the yours server response
@@ -157,7 +148,7 @@ public class UserInterface extends AppCompatActivity {
                     ((TextView)findViewById(R.id.timestamp)).setText("Ultima rilevazione: \n " +array.getJSONObject(0).getString("time"));
 
                     currentState = array.getJSONObject(0).getString("state");
-                    currentLevel = array.getJSONObject(0).getString("distance");
+                    currentLevel = Float.valueOf(array.getJSONObject(0).getString("distance"));
 
                     switch(currentState){
                         case "ALLARM":
@@ -212,46 +203,29 @@ public class UserInterface extends AppCompatActivity {
         });
     }
 
-    /*private void tryHttpPost() throws JSONException {
+    private void tryHttpPost(String percentageOpening) throws JSONException {
 
-        final String url = "http://dummy.restapiexample.com/api/v1/create";
+        int finalData = Integer.valueOf(percentageOpening.replace("%", ""));
+
+        Log.d("SendingMessage", "Distance: "+ currentLevel + ", State: "+ currentState + ", Open-Angle: " +finalData);
+
+
         final String content = new JSONObject()
-                .put("name","test" + new Random().nextLong())
-                .put("salary","1000")
-                .put("age","30").toString();
+                .put("distance", currentLevel)
+                .put("state", currentState)
+                .put("sender", "APP")
+                .put("open-angle", finalData).toString();
 
-        Http.post(url, content.getBytes(), response -> {
-            if(response.code() == HttpURLConnection.HTTP_OK){
-                try {
-                    ((TextView)findViewById(R.id.angle)).setText(response.contentAsString());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+        Http.post(global.url, content.getBytes(), response -> {
+            if(response.code() == HttpURLConnection.HTTP_OK) {
+                Toast.makeText(UserInterface.this, "Dati inviati correttamente al server!", Toast.LENGTH_LONG).show();
+                bluetoothConn.sendMessage("New opening: " + finalData);
+            }else
+                Toast.makeText(UserInterface.this,"Si è verificato un problema, i dati NON sono stati inviati al server!", Toast.LENGTH_LONG).show();
         });
-    }*/
+    }
 
     private void showAlert() {
-
-        AlertDialog.Builder b=  new  AlertDialog.Builder(UserInterface.this)
-                .setTitle("Modalità modifica")
-                .setPositiveButton("OK",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                // TODO Conferma - qui si deve creare una richiesta bluethoot che comunica il nuovo angolo del servo
-                                /* Qui bisogna fare un controllo - se non è ancora connesso a bt allora deve rifiutare la richiesta*/
-                                bluetoothConn.sendMessage("test");
-                            }
-                        }
-                )
-                .setNegativeButton("Cancel",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                modalitySwitch.setChecked(false);
-                                dialog.dismiss();
-                            }
-                        }
-                );
 
         LayoutInflater i = UserInterface.this.getLayoutInflater();
 
@@ -266,7 +240,35 @@ public class UserInterface extends AppCompatActivity {
         openingDam.setText("Il livello corrente di acqua è pari a: " + currentLevel + ". " +
                 "Selezionare la nuova apertura della diga: ");
 
-        ((Spinner)v.findViewById(R.id.spinner_modify_dam)).setAdapter(adapter);
+        Spinner spinner = (Spinner)v.findViewById(R.id.spinner_modify_dam);
+
+        spinner.setAdapter(adapter);
+
+        AlertDialog.Builder b=  new  AlertDialog.Builder(UserInterface.this)
+                .setTitle("Modalità modifica")
+                .setPositiveButton("OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                // TODO Conferma - qui si deve creare una richiesta bluethoot che comunica il nuovo angolo del servo
+                                /* Qui bisogna fare un controllo - se non è ancora connesso a bt allora deve rifiutare la richiesta*/
+                                try {
+                                    tryHttpPost(spinner.getSelectedItem().toString());
+                                    modalitySwitch.setChecked(false);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                )
+                .setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                modalitySwitch.setChecked(false);
+                                dialog.dismiss();
+                            }
+                        }
+                );
+
         b.setView(v);
         b.create().show();
     }

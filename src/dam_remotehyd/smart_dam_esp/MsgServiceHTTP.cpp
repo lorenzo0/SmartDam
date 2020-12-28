@@ -20,7 +20,8 @@ void MsgServiceHTTP::sendMsg(const float& value, const String& state){
      HTTPClient http;
      http.begin(String(addressWIFI) + "/api/data");      
      http.addHeader("Content-Type", "application/json");     
-     String msg = String("{ \"distance\": ") + String(value) + ", \"state\": \"" + state +"\" }";
+     String msg = String("{ \"distance\": ") + String(value) + ", \"state\": \"" + state + "\", \"sender\": \"" + sender +"\"}";
+     Serial.println("Messaggio da inviare: " + msg);
      int retCode = http.POST(msg);   
      http.end();  
 

@@ -1,5 +1,4 @@
 #include "Scheduler.h"
-#include "MsgServiceHTTP.h"
 
 void Scheduler::init(){
   nTasks = 0;
