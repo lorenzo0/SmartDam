@@ -1,4 +1,4 @@
-package it.unibo.isi.seeiot.androidexample02.netutils;
+package it.unibo.isi.seeiot.dam_app.netutils;
 
 import java.io.BufferedReader;
 import java.io.IOException;

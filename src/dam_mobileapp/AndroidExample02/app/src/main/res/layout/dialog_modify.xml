@@ -1,0 +1,31 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="40px"
+    android:layout_gravity="center">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:scaleType="center"
+        android:background="#FFFFBB33"
+        android:contentDescription="@string/app_name" />
+
+    <TextView
+        android:id="@+id/newOpening"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="30px"
+        android:text="Seleziona la nuova apertura della diga"
+        android:textStyle="bold" />
+
+    <Spinner
+        android:id="@+id/spinner_modify_dam"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
+        android:padding="60px"/>
+
+</LinearLayout>

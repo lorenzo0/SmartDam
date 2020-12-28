@@ -4,18 +4,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
 
     <Button
         android:id="@+id/info_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="150dp"
-        android:layout_marginTop="93dp"
-        android:layout_marginEnd="150dp"
+        android:layout_marginStart="39dp"
+        android:layout_marginTop="35dp"
+        android:layout_marginBottom="109dp"
         android:text="Update Info"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/state"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -23,40 +24,40 @@
         android:id="@+id/level_water"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="75dp"
-        android:layout_marginTop="211dp"
-        android:layout_marginEnd="51dp"
+        android:layout_marginStart="56dp"
+        android:layout_marginTop="60dp"
+        android:layout_marginBottom="19dp"
         android:text="Level water:"
         android:textSize="20sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/open_angle_dam"
+        app:layout_constraintBottom_toTopOf="@+id/level"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/image_dam" />
 
     <TextView
         android:id="@+id/open_angle_dam"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="40dp"
-        android:layout_marginTop="211dp"
-        android:layout_marginEnd="48dp"
+        android:layout_marginStart="68dp"
+        android:layout_marginTop="60dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="19dp"
         android:text="Open angle dam:"
         android:textSize="20sp"
         android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/angle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/level_water"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/image_dam" />
 
     <TextView
         android:id="@+id/level"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="70dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginEnd="141dp"
+        android:layout_marginStart="80dp"
+        android:layout_marginTop="19dp"
         android:text="TextView"
-        app:layout_constraintEnd_toStartOf="@+id/angle"
-        app:layout_constraintHorizontal_bias="0.0"
+        android:textSize="40px"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/level_water" />
 
@@ -64,72 +65,70 @@
         android:id="@+id/angle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="275dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="50dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="84dp"
         android:text="TextView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/open_angle_dam" />
-
-    <!--tools:srcCompat="@drawable/dam.png" -->
 
     <ImageView
         android:id="@+id/image_dam"
-        android:layout_width="129dp"
-        android:layout_height="201dp"
-        android:layout_marginStart="200dp"
-        android:layout_marginEnd="206dp"
-        android:layout_marginBottom="40dp"
-        app:layout_constraintBottom_toTopOf="@+id/switch_label"
+        android:layout_width="151dp"
+        android:layout_height="164dp"
+        android:layout_marginStart="133dp"
+        android:layout_marginTop="65dp"
+        android:layout_marginEnd="128dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/dam" />
-    <!--app:srcCompat="@drawable/dam" -->
+        app:layout_constraintTop_toBottomOf="@+id/timestamp" />
 
     <TextView
         android:id="@+id/switch_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="152dp"
-        android:layout_marginEnd="152dp"
-        android:layout_marginBottom="19dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="16dp"
         android:text="Switch to manual"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/switch1"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Switch
         android:id="@+id/switch1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="182dp"
-        android:layout_marginEnd="183dp"
-        android:layout_marginBottom="94dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="48dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="-1dp" />
+        app:layout_constraintTop_toBottomOf="@+id/switch_label" />
 
     <TextView
-        android:id="@+id/label_toolbar"
+        android:id="@+id/state"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginStart="144dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="144dp"
+        android:text="TextView"
+        android:textSize="80px"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/info_button" />
+
+    <TextView
+        android:id="@+id/timestamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="100dp"
-        android:layout_marginTop="16dp"
-        android:text="Finchè l'acqua c'è, lasciala andare"
-        android:textColor="@android:color/white"
+        android:layout_marginStart="176dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="177dp"
+        android:layout_marginBottom="70dp"
+        android:text="TextView"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toTopOf="@+id/image_dam"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/state" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

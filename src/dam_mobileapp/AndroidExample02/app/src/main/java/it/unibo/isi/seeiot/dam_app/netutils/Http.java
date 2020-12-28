@@ -1,4 +1,4 @@
-package it.unibo.isi.seeiot.androidexample02.netutils;
+package it.unibo.isi.seeiot.dam_app.netutils;
 
 import android.os.AsyncTask;
 import java.io.IOException;
@@ -34,7 +34,7 @@ public class Http {
         }.execute();
     }
 
-    public static void post(final String url, final byte[] payload, final Listener listener){
+    /*public static void post(final String url, final byte[] payload, final Listener listener){
         new AsyncTask<Void, Void, HttpResponse>(){
             @Override
             protected HttpResponse doInBackground(Void... voids) {
@@ -56,5 +56,5 @@ public class Http {
                 listener.onHttpResponseAvailable(response);
             }
         }.execute();
-    }
+    }*/
 }
