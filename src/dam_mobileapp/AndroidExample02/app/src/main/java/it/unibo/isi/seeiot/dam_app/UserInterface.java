@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +35,7 @@ import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Timer;
 
 import cit.unibo.isi.seeiot.dam_app.R;
 import it.unibo.isi.seeiot.dam_app.bluetooth.Bluetooth;
@@ -54,7 +56,8 @@ public class UserInterface extends AppCompatActivity {
     Float currentLevel;
     List<String> spinnerArray = null;
     Bluetooth bluetoothConn;
-
+    Timer timer = new Timer();
+    CountDownTimer countDown;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +89,7 @@ public class UserInterface extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        tryHttpGet();
+        //tryHttpGet();
     }
 
 
@@ -94,8 +97,9 @@ public class UserInterface extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if(!(checkOnCreate))
-            tryHttpGet();
+            //tryHttpGet();
         checkOnCreate = false;
+        createCountDown(5000);
     }
 
     private void initUI() {
@@ -216,6 +220,7 @@ public class UserInterface extends AppCompatActivity {
                 .put("sender", "APP")
                 .put("open-angle", finalData).toString();
 
+        /* Qui bisogna effettuare un controllo in più. Se non c'è la connessione bluethoot, non mando neanche quello http */
         Http.post(global.url, content.getBytes(), response -> {
             if(response.code() == HttpURLConnection.HTTP_OK) {
                 Toast.makeText(UserInterface.this, "Dati inviati correttamente al server!", Toast.LENGTH_LONG).show();
@@ -301,6 +306,29 @@ public class UserInterface extends AppCompatActivity {
         spinnerArray.add("80%");
         spinnerArray.add("100%");
         return spinnerArray;
+    }
+
+    /* CountDown handle */
+
+    public void createCountDown(long numberMilliSec){
+        countDown = new CountDownTimer(numberMilliSec, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+
+                //Toast.makeText(getApplicationContext(),"Tic!",Toast.LENGTH_SHORT).show();
+            }
+            public void onFinish() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        //Toast.makeText(getApplicationContext(),"Finito!",Toast.LENGTH_LONG).show();
+                        //tryHttpGet();
+                    }
+                });
+            }
+        };
+
+        countDown.start();
     }
 
 }
