@@ -23,7 +23,7 @@ private:
 
 char* nameWIFI = "Wind3 HUB-7C4FA6";
 char* pwdWIFI = "CasaPisano!!";
-char* addressWIFI = "http://8bf2e179ec6a.ngrok.io";
+char* addressWIFI = "http://8162c9d52e9f.ngrok.io";
 String sender = "ESP";
 
 };

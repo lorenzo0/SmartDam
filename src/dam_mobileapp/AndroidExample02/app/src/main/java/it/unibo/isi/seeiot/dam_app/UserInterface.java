@@ -39,8 +39,10 @@ import java.util.Timer;
 
 import cit.unibo.isi.seeiot.dam_app.R;
 import it.unibo.isi.seeiot.dam_app.bluetooth.Bluetooth;
+import it.unibo.isi.seeiot.dam_app.netutils.HTTPRequests;
 import it.unibo.isi.seeiot.dam_app.netutils.Http;
 import it.unibo.isi.seeiot.dam_app.utils.global;
+import it.unibo.isi.seeiot.dam_app.utils.handlerAlert;
 import unibo.btlib.exceptions.BluetoothDeviceNotFound;
 
 public class UserInterface extends AppCompatActivity {
@@ -50,14 +52,12 @@ public class UserInterface extends AppCompatActivity {
      */
 
     Switch modalitySwitch;
-    Spinner spinner;
     boolean checkOnCreate;
-    String currentState;
-    Float currentLevel;
-    List<String> spinnerArray = null;
     Bluetooth bluetoothConn;
-    Timer timer = new Timer();
     CountDownTimer countDown;
+    handlerAlert alerHandler;
+    HTTPRequests httpRequests;
+    View currentView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +65,8 @@ public class UserInterface extends AppCompatActivity {
         setContentView(R.layout.user_interface);
 
         bluetoothConn = new Bluetooth();
+        alerHandler = new handlerAlert();
+        httpRequests = new HTTPRequests();
 
         final BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
         if (btAdapter != null && !btAdapter.isEnabled()) {
@@ -72,7 +74,7 @@ public class UserInterface extends AppCompatActivity {
         }
 
         modalitySwitch = (Switch) findViewById(R.id.switch1);
-        spinnerArray = fillChoice(spinnerArray);
+        currentView = findViewById(R.id.angle).getRootView();
         checkOnCreate = true;
 
         initUI();
@@ -89,7 +91,7 @@ public class UserInterface extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        //tryHttpGet();
+        httpRequests.tryHttpGet(currentView);
     }
 
 
@@ -97,7 +99,7 @@ public class UserInterface extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if(!(checkOnCreate))
-            //tryHttpGet();
+            httpRequests.tryHttpGet(currentView);
         checkOnCreate = false;
         createCountDown(5000);
     }
@@ -106,21 +108,16 @@ public class UserInterface extends AppCompatActivity {
         findViewById(R.id.info_button).setOnClickListener(v -> {
             final ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
             final NetworkInfo activeNetwork = Objects.requireNonNull(cm).getActiveNetworkInfo();
-
-            if(activeNetwork.isConnectedOrConnecting()){
-                tryHttpGet();
-            }
-
         });
 
         modalitySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked) {
-                    if (currentState.equals("ALLARM")) {
+                    if (global.currentState.equals("ALLARM")) {
                         connectBT();
-                        showAlert();
+                        alerHandler.showAlert(UserInterface.this, currentView, httpRequests, bluetoothConn);
                     }else {
-                        showWarningAlert();
+                        alerHandler.showWarningAlert(UserInterface.this);
                         modalitySwitch.setChecked(false);
                     }
                 }
@@ -128,201 +125,22 @@ public class UserInterface extends AppCompatActivity {
         });
     }
 
-    private void tryHttpGet(){
 
-        Http.get(global.url, response -> {
-            if(response.code() == HttpURLConnection.HTTP_OK){
-                try {
-                    //JSONObject jsonObject = new JSONObject(response.contentAsString()); //Here reponse is the yours server response
-                    JSONArray array = new JSONArray(response.contentAsString());
-                    Log.d("resp1", array.toString());
-
-                    /*for(int i=0;i<array.length();i++) Questo per avere tutti i record!
-                    {
-                        String time = array.getJSONObject(i).getString("time");
-                        String value = array.getJSONObject(i).getString("value");
-                        String place = array.getJSONObject(i).getString("place");
-
-                        Toast.makeText(getApplicationContext(),time+" - "+value+" - "+place,Toast.LENGTH_LONG).show();
-                    }*/
-
-                    ((TextView)findViewById(R.id.angle)).setText(array.getJSONObject(0).getString("open-angle"));
-                    ((TextView)findViewById(R.id.level)).setText(array.getJSONObject(0).getString("distance"));
-                    ((TextView)findViewById(R.id.state)).setText(array.getJSONObject(0).getString("state"));
-                    ((TextView)findViewById(R.id.timestamp)).setText("Ultima rilevazione: \n " +array.getJSONObject(0).getString("time"));
-
-                    currentState = array.getJSONObject(0).getString("state");
-                    currentLevel = Float.valueOf(array.getJSONObject(0).getString("distance"));
-
-                    switch(currentState){
-                        case "ALLARM":
-                            ((TextView)findViewById(R.id.state)).setTextColor(Color.parseColor("#ff0000"));
-
-                            ((TextView)findViewById(R.id.level_water)).setVisibility(View.VISIBLE);
-                            ((TextView)findViewById(R.id.level)).setVisibility(View.VISIBLE);
-
-                            ((TextView)findViewById(R.id.open_angle_dam)).setVisibility(View.VISIBLE);
-                            ((TextView)findViewById(R.id.angle)).setVisibility(View.VISIBLE);
-                            break;
-
-                        case "PRE-ALLARM":
-                            ((TextView)findViewById(R.id.state)).setTextColor(Color.parseColor("#ff8100"));
-
-                            ((TextView)findViewById(R.id.level_water)).setVisibility(View.VISIBLE);
-                            ((TextView)findViewById(R.id.level)).setVisibility(View.VISIBLE);
-
-                            ((TextView)findViewById(R.id.open_angle_dam)).setVisibility(View.GONE);
-                            ((TextView)findViewById(R.id.angle)).setVisibility(View.GONE);
-                            break;
-
-                        case "NORMAL":
-                            ((TextView)findViewById(R.id.state)).setTextColor(Color.parseColor("#00ff11"));
-
-                            ((TextView)findViewById(R.id.level_water)).setVisibility(View.GONE);
-                            ((TextView)findViewById(R.id.level)).setVisibility(View.GONE);
-
-                            ((TextView)findViewById(R.id.open_angle_dam)).setVisibility(View.GONE);
-                            ((TextView)findViewById(R.id.angle)).setVisibility(View.GONE);
-
-                            break;
-                    }
-
-                    switch(Integer.parseInt(array.getJSONObject(array.length()-1).getString("open-angle"))){
-                        case 0:
-                            ((ImageView)findViewById(R.id.image_dam)).setImageResource(R.drawable.empty_dam);
-                            break;
-
-                        case 100:
-                            ((ImageView)findViewById(R.id.image_dam)).setImageResource(R.drawable.full_dam);
-                            break;
-
-                        default:
-                            ((ImageView)findViewById(R.id.image_dam)).setImageResource(R.drawable.working_dam);
-                            break;
-                    }
-                } catch (IOException | JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-
-    private void tryHttpPost(String percentageOpening) throws JSONException {
-
-        int finalData = Integer.valueOf(percentageOpening.replace("%", ""));
-
-        Log.d("SendingMessage", "Distance: "+ currentLevel + ", State: "+ currentState + ", Open-Angle: " +finalData);
-
-
-        final String content = new JSONObject()
-                .put("distance", currentLevel)
-                .put("state", currentState)
-                .put("sender", "APP")
-                .put("open-angle", finalData).toString();
-
-        /* Qui bisogna effettuare un controllo in più. Se non c'è la connessione bluethoot, non mando neanche quello http */
-        Http.post(global.url, content.getBytes(), response -> {
-            if(response.code() == HttpURLConnection.HTTP_OK) {
-                Toast.makeText(UserInterface.this, "Dati inviati correttamente al server!", Toast.LENGTH_LONG).show();
-                bluetoothConn.sendMessage("New opening: " + finalData);
-            }else
-                Toast.makeText(UserInterface.this,"Si è verificato un problema, i dati NON sono stati inviati al server!", Toast.LENGTH_LONG).show();
-        });
-    }
-
-    private void showAlert() {
-
-        LayoutInflater i = UserInterface.this.getLayoutInflater();
-
-        View v = i.inflate(R.layout.dialog_modify,null);
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                this, android.R.layout.simple_spinner_item, spinnerArray);
-
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        TextView openingDam = (TextView) v.findViewById(R.id.newOpening);
-
-        openingDam.setText("Il livello corrente di acqua è pari a: " + currentLevel + ". " +
-                "Selezionare la nuova apertura della diga: ");
-
-        Spinner spinner = (Spinner)v.findViewById(R.id.spinner_modify_dam);
-
-        spinner.setAdapter(adapter);
-
-        AlertDialog.Builder b=  new  AlertDialog.Builder(UserInterface.this)
-                .setTitle("Modalità modifica")
-                .setPositiveButton("OK",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                // TODO Conferma - qui si deve creare una richiesta bluethoot che comunica il nuovo angolo del servo
-                                /* Qui bisogna fare un controllo - se non è ancora connesso a bt allora deve rifiutare la richiesta*/
-                                try {
-                                    tryHttpPost(spinner.getSelectedItem().toString());
-                                    modalitySwitch.setChecked(false);
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
-                )
-                .setNegativeButton("Cancel",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                modalitySwitch.setChecked(false);
-                                dialog.dismiss();
-                            }
-                        }
-                );
-
-        b.setView(v);
-        b.create().show();
-    }
-
-    private void showWarningAlert() {
-        final AlertDialog dialog = new AlertDialog.Builder(UserInterface.this)
-                .setTitle("Errore")
-                .setMessage("E' possibile entrare in modalità modifica solo nel caso in cui lo stato corrente è ALLARME")
-                .setCancelable(false)
-                .setNeutralButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.dismiss();
-                    }
-                })
-                .create();
-
-        dialog.show();
-    }
-
-    /*
-     *   E' possibile per l'operatore inserire alcuni valori percentili per
-     *   l'apertura della diga. (dati dalle specifiche)
-    */
-    private List<String>  fillChoice(List<String> spinnerArray){
-        spinnerArray = new ArrayList<String>();
-        spinnerArray.add("0%");
-        spinnerArray.add("20%");
-        spinnerArray.add("40%");
-        spinnerArray.add("60%");
-        spinnerArray.add("80%");
-        spinnerArray.add("100%");
-        return spinnerArray;
-    }
 
     /* CountDown handle */
 
     public void createCountDown(long numberMilliSec){
         countDown = new CountDownTimer(numberMilliSec, 1000) {
 
-            public void onTick(long millisUntilFinished) {
+            public void onTick(long millisUntilFinished) {}
 
-                //Toast.makeText(getApplicationContext(),"Tic!",Toast.LENGTH_SHORT).show();
-            }
             public void onFinish() {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        //Toast.makeText(getApplicationContext(),"Finito!",Toast.LENGTH_LONG).show();
-                        //tryHttpGet();
+                        //Toast.makeText(getApplicationContext(),"Finito!",Toast.LENGTH_SHORT).show();
+                        httpRequests.tryHttpGet(currentView);
+                        createCountDown(numberMilliSec);
                     }
                 });
             }

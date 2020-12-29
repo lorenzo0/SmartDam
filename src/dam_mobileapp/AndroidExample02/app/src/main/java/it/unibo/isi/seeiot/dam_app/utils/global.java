@@ -3,7 +3,10 @@ package it.unibo.isi.seeiot.dam_app.utils;
 public class global {
 
     public static final String APP_LOG_TAG = "BT CLN";
-    public static final String url = "http://8bf2e179ec6a.ngrok.io/api/data";
+    public static final String url = "http://8162c9d52e9f.ngrok.io/api/data";
+
+    public static float currentLevel;
+    public static String currentState;
 
     public class bluetooth {
         public static final int ENABLE_BT_REQUEST = 1;
