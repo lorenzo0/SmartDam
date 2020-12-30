@@ -70,10 +70,8 @@ public class UserInterface extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        httpRequests.tryHttpGetUI(currentView);
-        //httpRequests.tryHttpGetHData();
-        //httpRequests.tryHttpGetUI(currentView);
-        //httpRequests.tryHttpGetUIX();
+        httpRequests.tryHttpGetHData(currentView);
+        //httpRequests.modifyItemsOnUI(currentView);
     }
 
 
@@ -81,17 +79,18 @@ public class UserInterface extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if(!(checkOnCreate))
-            httpRequests.tryHttpGetUI(currentView);
+            httpRequests.tryHttpGetHData(currentView);
         checkOnCreate = false;
-        //createCountDown(5000);
+        createCountDown(5000);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        checkOnCreate = true;
     }
 
     private void initUI() {
-        /*findViewById(R.id.info_button).setOnClickListener(v -> {
-            final ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-            final NetworkInfo activeNetwork = Objects.requireNonNull(cm).getActiveNetworkInfo();
-        });*/
-
         modalitySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked) {
@@ -130,7 +129,9 @@ public class UserInterface extends AppCompatActivity {
                     @Override
                     public void run() {
                         //Toast.makeText(getApplicationContext(),"Finito!",Toast.LENGTH_SHORT).show();
-                        httpRequests.tryHttpGetUI(currentView);
+                        httpRequests.tryHttpGetHData(currentView);
+                        /*if(httpRequests.getDataReceiveds().size() != 0)
+                            httpRequests.modifyItemsOnUI(currentView);*/
                         createCountDown(numberMilliSec);
                     }
                 });

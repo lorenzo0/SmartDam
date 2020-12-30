@@ -11,6 +11,7 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
 import cit.unibo.isi.seeiot.dam_app.R;
+import it.unibo.isi.seeiot.dam_app.UserInterface;
 import it.unibo.isi.seeiot.dam_app.bluetooth.Bluetooth;
 import it.unibo.isi.seeiot.dam_app.utils.global;
 
@@ -28,6 +30,12 @@ public class HTTPRequests implements Serializable {
     ArrayList<DataReceived> dataReceiveds = new ArrayList<DataReceived>();
 
     public HTTPRequests(){
+    }
+
+    public void tryHttpPostLog(String message) throws JSONException {
+        final String content = new JSONObject()
+                .put("sender", "APP")
+                .put("message", message).toString();
     }
 
     public void tryHttpPost(String percentageOpening, Context context, Bluetooth bluetoothConn) throws JSONException {
@@ -43,140 +51,79 @@ public class HTTPRequests implements Serializable {
                 .put("sender", "APP")
                 .put("open-angle", finalData).toString();
 
-        /* Qui bisogna effettuare un controllo in più. Se non c'è la connessione bluethoot, non mando neanche quello http */
+
         Http.post(global.url, content.getBytes(), response -> {
-            if(response.code() == HttpURLConnection.HTTP_OK) {
+            if(response.code() == HttpURLConnection.HTTP_OK && bluetoothConn.btChannel != null) {
                 Toast.makeText(context, "Dati inviati correttamente al server!", Toast.LENGTH_LONG).show();
-                //bluetoothConn.sendMessage("New opening: " + finalData);
+                bluetoothConn.sendMessage("New opening: " + finalData);
             }else
                 Toast.makeText(context,"Si è verificato un problema, i dati NON sono stati inviati al server!", Toast.LENGTH_LONG).show();
         });
     }
 
-    public void tryHttpGetUI(View oldView){
+    public void modifyItemsOnUI(View oldView) {
 
-        Http.get(global.url, response -> {
-            if(response.code() == HttpURLConnection.HTTP_OK){
-                try {
-                    JSONArray array = new JSONArray(response.contentAsString());
-                    Log.d("resp1", array.toString());
+        ((TextView) oldView.findViewById(R.id.angle)).setText(Integer.toString(dataReceiveds.get(0).getAngle()));
+        ((TextView) oldView.findViewById(R.id.level)).setText(Float.toString(dataReceiveds.get(0).getDistance()));
+        ((TextView) oldView.findViewById(R.id.state)).setText(dataReceiveds.get(0).getState());
+        ((TextView) oldView.findViewById(R.id.timestamp)).setText("Ultima rilevazione: \n " + dataReceiveds.get(0).getTime());
 
-                    /*for(int i=0;i<array.length();i++) Questo per avere tutti i record!
-                    {
-                        String time = array.getJSONObject(i).getString("time");
-                        String value = array.getJSONObject(i).getString("value");
-                        String place = array.getJSONObject(i).getString("place");
+        switch (global.currentState) {
+            case "ALLARM":
+                ((TextView) oldView.findViewById(R.id.state)).setTextColor(Color.parseColor("#ff0000"));
 
-                        Toast.makeText(getApplicationContext(),time+" - "+value+" - "+place,Toast.LENGTH_LONG).show();
-                    }*/
+                ((TextView) oldView.findViewById(R.id.level_water)).setVisibility(View.VISIBLE);
+                ((TextView) oldView.findViewById(R.id.level)).setVisibility(View.VISIBLE);
 
-                    for(int i=0;i<array.length();i++)
-                    {
-                        sampleData = new DataReceived(Float.valueOf(array.getJSONObject(i).getString("distance")),
-                                array.getJSONObject(i).getString("state"),
-                                array.getJSONObject(i).getString("time"),
-                                array.getJSONObject(i).getInt("open-angle"));
+                ((TextView) oldView.findViewById(R.id.open_angle_dam)).setVisibility(View.VISIBLE);
+                ((TextView) oldView.findViewById(R.id.angle)).setVisibility(View.VISIBLE);
+                break;
 
-                        dataReceiveds.add(sampleData);
-                    }
+            case "PRE-ALLARM":
+                ((TextView) oldView.findViewById(R.id.state)).setTextColor(Color.parseColor("#ff8100"));
 
-                    ((TextView)oldView.findViewById(R.id.angle)).setText(array.getJSONObject(0).getString("open-angle"));
-                    ((TextView)oldView.findViewById(R.id.level)).setText(array.getJSONObject(0).getString("distance"));
-                    ((TextView)oldView.findViewById(R.id.state)).setText(array.getJSONObject(0).getString("state"));
-                    ((TextView)oldView.findViewById(R.id.timestamp)).setText("Ultima rilevazione: \n " +array.getJSONObject(0).getString("time"));
+                ((TextView) oldView.findViewById(R.id.level_water)).setVisibility(View.VISIBLE);
+                ((TextView) oldView.findViewById(R.id.level)).setVisibility(View.VISIBLE);
 
-                    global.currentState = array.getJSONObject(0).getString("state");
-                    global.currentLevel = Float.valueOf(array.getJSONObject(0).getString("distance"));
+                ((TextView) oldView.findViewById(R.id.open_angle_dam)).setVisibility(View.GONE);
+                ((TextView) oldView.findViewById(R.id.angle)).setVisibility(View.GONE);
+                break;
 
-                    switch(global.currentState){
-                        case "ALLARM":
-                            ((TextView)oldView.findViewById(R.id.state)).setTextColor(Color.parseColor("#ff0000"));
+            case "NORMAL":
+                ((TextView) oldView.findViewById(R.id.state)).setTextColor(Color.parseColor("#00ff11"));
 
-                            ((TextView)oldView.findViewById(R.id.level_water)).setVisibility(View.VISIBLE);
-                            ((TextView)oldView.findViewById(R.id.level)).setVisibility(View.VISIBLE);
+                ((TextView) oldView.findViewById(R.id.level_water)).setVisibility(View.GONE);
+                ((TextView) oldView.findViewById(R.id.level)).setVisibility(View.GONE);
 
-                            ((TextView)oldView.findViewById(R.id.open_angle_dam)).setVisibility(View.VISIBLE);
-                            ((TextView)oldView.findViewById(R.id.angle)).setVisibility(View.VISIBLE);
-                            break;
+                ((TextView) oldView.findViewById(R.id.open_angle_dam)).setVisibility(View.GONE);
+                ((TextView) oldView.findViewById(R.id.angle)).setVisibility(View.GONE);
 
-                        case "PRE-ALLARM":
-                            ((TextView)oldView.findViewById(R.id.state)).setTextColor(Color.parseColor("#ff8100"));
+                break;
+        }
 
-                            ((TextView)oldView.findViewById(R.id.level_water)).setVisibility(View.VISIBLE);
-                            ((TextView)oldView.findViewById(R.id.level)).setVisibility(View.VISIBLE);
+        switch (Integer.valueOf(dataReceiveds.get(0).getAngle())) {
+            case 0:
+                ((ImageView) oldView.findViewById(R.id.image_dam)).setImageResource(R.drawable.empty_dam);
+                break;
 
-                            ((TextView)oldView.findViewById(R.id.open_angle_dam)).setVisibility(View.GONE);
-                            ((TextView)oldView.findViewById(R.id.angle)).setVisibility(View.GONE);
-                            break;
+            case 100:
+                ((ImageView) oldView.findViewById(R.id.image_dam)).setImageResource(R.drawable.full_dam);
+                break;
 
-                        case "NORMAL":
-                            ((TextView)oldView.findViewById(R.id.state)).setTextColor(Color.parseColor("#00ff11"));
-
-                            ((TextView)oldView.findViewById(R.id.level_water)).setVisibility(View.GONE);
-                            ((TextView)oldView.findViewById(R.id.level)).setVisibility(View.GONE);
-
-                            ((TextView)oldView.findViewById(R.id.open_angle_dam)).setVisibility(View.GONE);
-                            ((TextView)oldView.findViewById(R.id.angle)).setVisibility(View.GONE);
-
-                            break;
-                    }
-
-                    switch(Integer.parseInt(array.getJSONObject(array.length()-1).getString("open-angle"))){
-                        case 0:
-                            ((ImageView)oldView.findViewById(R.id.image_dam)).setImageResource(R.drawable.empty_dam);
-                            break;
-
-                        case 100:
-                            ((ImageView)oldView.findViewById(R.id.image_dam)).setImageResource(R.drawable.full_dam);
-                            break;
-
-                        default:
-                            ((ImageView)oldView.findViewById(R.id.image_dam)).setImageResource(R.drawable.working_dam);
-                            break;
-                    }
-                } catch (IOException | JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+            default:
+                ((ImageView) oldView.findViewById(R.id.image_dam)).setImageResource(R.drawable.working_dam);
+                break;
+        }
     }
 
-    public void tryHttpGetUIX(){
+    public void tryHttpGetHData(View oldView){
 
-        Http.get(global.url, response -> {
-            if(response.code() == HttpURLConnection.HTTP_OK){
-                try {
-                    JSONArray array = new JSONArray(response.contentAsString());
-
-                    global.currentState = array.getJSONObject(0).getString("state");
-                    global.currentLevel = Float.valueOf(array.getJSONObject(0).getString("distance"));
-
-                    Log.d("resp1", array.toString());
-
-                    for(int i=0;i<array.length();i++)
-                    {
-                        sampleData = new DataReceived(Float.valueOf(array.getJSONObject(i).getString("distance")),
-                                array.getJSONObject(i).getString("state"),
-                                array.getJSONObject(i).getString("time"),
-                                array.getJSONObject(i).getInt("open-angle"));
-
-                        dataReceiveds.add(sampleData);
-                    }
-
-                } catch (IOException | JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-
-    public void tryHttpGetHData(){
+        dataReceiveds = new ArrayList<DataReceived>();
 
         Http.get(global.url, response -> {
             if (response.code() == HttpURLConnection.HTTP_OK) {
                 try {
                     JSONArray array = new JSONArray(response.contentAsString());
-                    Log.d("resp1-HD", array.toString());
 
                     global.currentState = array.getJSONObject(0).getString("state");
                     global.currentLevel = Float.valueOf(array.getJSONObject(0).getString("distance"));
@@ -191,13 +138,13 @@ public class HTTPRequests implements Serializable {
                         dataReceiveds.add(sampleData);
                     }
 
+                    modifyItemsOnUI(oldView);
 
                 } catch (IOException | JSONException e) {
                     e.printStackTrace();
                 }
             }
         });
-        Log.d("resp1-HD", Integer.toString(dataReceiveds.size()));
     }
 
     public ArrayList<DataReceived> getDataReceiveds() {

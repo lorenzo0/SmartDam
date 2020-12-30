@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import cit.unibo.isi.seeiot.dam_app.R;
 import it.unibo.isi.seeiot.dam_app.netutils.DataReceived;
 import it.unibo.isi.seeiot.dam_app.netutils.HTTPRequests;
+import unibo.btlib.ConnectToBluetoothServerTask;
 
 public class ShowHistoricalData extends AppCompatActivity {
     RecyclerView recyclerView;

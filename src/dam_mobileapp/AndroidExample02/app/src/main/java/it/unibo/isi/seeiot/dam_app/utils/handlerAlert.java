@@ -54,8 +54,6 @@ public class handlerAlert {
                 .setPositiveButton("OK",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                // TODO Conferma - qui si deve creare una richiesta bluethoot che comunica il nuovo angolo del servo
-                                /* Qui bisogna fare un controllo - se non è ancora connesso a bt allora deve rifiutare la richiesta*/
                                 try {
                                     httpRequests.tryHttpPost(spinner.getSelectedItem().toString(), context, bluetoothConn);
                                     ((Switch)oldView.findViewById(R.id.switch1)).setChecked(false);

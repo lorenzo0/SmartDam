@@ -54,6 +54,8 @@ void setup(){
 
   while (!Serial){}
   Serial.println("ready to go."); 
+
+  //msgService.print("AT+NAMEDamBluetoothCommunicator");
   
   /*pMotor = new ServoMotorImpl(9);
   

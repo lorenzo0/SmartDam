@@ -7,7 +7,8 @@ import it.unibo.isi.seeiot.dam_app.netutils.DataReceived;
 public class global {
 
     public static final String APP_LOG_TAG = "BT CLN";
-    public static final String url = "http://bf3678caae2a.ngrok.io/api/data";
+    public static final String url = "http://846f808e674a.ngrok.io/api/data";
+    public static final String urlLog = "http://846f808e674a.ngrok.io/api/log";
 
     public static float currentLevel;
     public static String currentState;
