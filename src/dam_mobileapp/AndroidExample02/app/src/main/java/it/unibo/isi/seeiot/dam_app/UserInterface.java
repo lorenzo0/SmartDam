@@ -1,46 +1,25 @@
 package it.unibo.isi.seeiot.dam_app;
 
-import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.Switch;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.Serializable;
 import java.util.Objects;
-import java.util.Timer;
 
 import cit.unibo.isi.seeiot.dam_app.R;
 import it.unibo.isi.seeiot.dam_app.bluetooth.Bluetooth;
 import it.unibo.isi.seeiot.dam_app.netutils.HTTPRequests;
-import it.unibo.isi.seeiot.dam_app.netutils.Http;
 import it.unibo.isi.seeiot.dam_app.utils.global;
 import it.unibo.isi.seeiot.dam_app.utils.handlerAlert;
 import unibo.btlib.exceptions.BluetoothDeviceNotFound;
@@ -91,7 +70,10 @@ public class UserInterface extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        httpRequests.tryHttpGet(currentView);
+        httpRequests.tryHttpGetUI(currentView);
+        //httpRequests.tryHttpGetHData();
+        //httpRequests.tryHttpGetUI(currentView);
+        //httpRequests.tryHttpGetUIX();
     }
 
 
@@ -99,16 +81,16 @@ public class UserInterface extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if(!(checkOnCreate))
-            httpRequests.tryHttpGet(currentView);
+            httpRequests.tryHttpGetUI(currentView);
         checkOnCreate = false;
-        createCountDown(5000);
+        //createCountDown(5000);
     }
 
     private void initUI() {
-        findViewById(R.id.info_button).setOnClickListener(v -> {
+        /*findViewById(R.id.info_button).setOnClickListener(v -> {
             final ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
             final NetworkInfo activeNetwork = Objects.requireNonNull(cm).getActiveNetworkInfo();
-        });
+        });*/
 
         modalitySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -123,6 +105,15 @@ public class UserInterface extends AppCompatActivity {
                 }
             }
         });
+
+        findViewById(R.id.info_button).setOnClickListener(v -> {
+            Intent intent = new Intent(this, ShowHistoricalData.class);
+            Bundle args = new Bundle();
+            args.putSerializable("ARRAYLIST",(Serializable)httpRequests.getDataReceiveds());
+            intent.putExtra("BUNDLE",args);
+            startActivity(intent);
+        });
+
     }
 
 
@@ -139,7 +130,7 @@ public class UserInterface extends AppCompatActivity {
                     @Override
                     public void run() {
                         //Toast.makeText(getApplicationContext(),"Finito!",Toast.LENGTH_SHORT).show();
-                        httpRequests.tryHttpGet(currentView);
+                        httpRequests.tryHttpGetUI(currentView);
                         createCountDown(numberMilliSec);
                     }
                 });

@@ -13,14 +13,19 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicReference;
 
 import cit.unibo.isi.seeiot.dam_app.R;
-import it.unibo.isi.seeiot.dam_app.UserInterface;
 import it.unibo.isi.seeiot.dam_app.bluetooth.Bluetooth;
 import it.unibo.isi.seeiot.dam_app.utils.global;
 
-public class HTTPRequests {
+public class HTTPRequests implements Serializable {
+
+    DataReceived sampleData;
+    ArrayList<DataReceived> dataReceiveds = new ArrayList<DataReceived>();
 
     public HTTPRequests(){
     }
@@ -48,7 +53,7 @@ public class HTTPRequests {
         });
     }
 
-    public void tryHttpGet(View oldView){
+    public void tryHttpGetUI(View oldView){
 
         Http.get(global.url, response -> {
             if(response.code() == HttpURLConnection.HTTP_OK){
@@ -64,6 +69,16 @@ public class HTTPRequests {
 
                         Toast.makeText(getApplicationContext(),time+" - "+value+" - "+place,Toast.LENGTH_LONG).show();
                     }*/
+
+                    for(int i=0;i<array.length();i++)
+                    {
+                        sampleData = new DataReceived(Float.valueOf(array.getJSONObject(i).getString("distance")),
+                                array.getJSONObject(i).getString("state"),
+                                array.getJSONObject(i).getString("time"),
+                                array.getJSONObject(i).getInt("open-angle"));
+
+                        dataReceiveds.add(sampleData);
+                    }
 
                     ((TextView)oldView.findViewById(R.id.angle)).setText(array.getJSONObject(0).getString("open-angle"));
                     ((TextView)oldView.findViewById(R.id.level)).setText(array.getJSONObject(0).getString("distance"));
@@ -124,5 +139,68 @@ public class HTTPRequests {
                 }
             }
         });
+    }
+
+    public void tryHttpGetUIX(){
+
+        Http.get(global.url, response -> {
+            if(response.code() == HttpURLConnection.HTTP_OK){
+                try {
+                    JSONArray array = new JSONArray(response.contentAsString());
+
+                    global.currentState = array.getJSONObject(0).getString("state");
+                    global.currentLevel = Float.valueOf(array.getJSONObject(0).getString("distance"));
+
+                    Log.d("resp1", array.toString());
+
+                    for(int i=0;i<array.length();i++)
+                    {
+                        sampleData = new DataReceived(Float.valueOf(array.getJSONObject(i).getString("distance")),
+                                array.getJSONObject(i).getString("state"),
+                                array.getJSONObject(i).getString("time"),
+                                array.getJSONObject(i).getInt("open-angle"));
+
+                        dataReceiveds.add(sampleData);
+                    }
+
+                } catch (IOException | JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    public void tryHttpGetHData(){
+
+        Http.get(global.url, response -> {
+            if (response.code() == HttpURLConnection.HTTP_OK) {
+                try {
+                    JSONArray array = new JSONArray(response.contentAsString());
+                    Log.d("resp1-HD", array.toString());
+
+                    global.currentState = array.getJSONObject(0).getString("state");
+                    global.currentLevel = Float.valueOf(array.getJSONObject(0).getString("distance"));
+
+                    for(int i=0;i<array.length();i++)
+                    {
+                        sampleData = new DataReceived(Float.valueOf(array.getJSONObject(i).getString("distance")),
+                                                        array.getJSONObject(i).getString("state"),
+                                                        array.getJSONObject(i).getString("time"),
+                                                        array.getJSONObject(i).getInt("open-angle"));
+
+                        dataReceiveds.add(sampleData);
+                    }
+
+
+                } catch (IOException | JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        Log.d("resp1-HD", Integer.toString(dataReceiveds.size()));
+    }
+
+    public ArrayList<DataReceived> getDataReceiveds() {
+        return dataReceiveds;
     }
 }
