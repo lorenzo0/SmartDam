@@ -61,7 +61,10 @@ public class HTTPRequests implements Serializable {
         });
     }
 
-    public void modifyItemsOnUI(View oldView) {
+    public void modifyItemsOnUI(View oldView, Bluetooth bluetooth) {
+
+        if(bluetooth.btChannel != null)
+            bluetooth.sendMessage(dataReceiveds.get(0).getState());
 
         ((TextView) oldView.findViewById(R.id.angle)).setText(Integer.toString(dataReceiveds.get(0).getAngle()));
         ((TextView) oldView.findViewById(R.id.level)).setText(Float.toString(dataReceiveds.get(0).getDistance()));
@@ -122,39 +125,44 @@ public class HTTPRequests implements Serializable {
 
         Http.get(global.url, response -> {
             if (response.code() == HttpURLConnection.HTTP_OK) {
-                try {
-                    JSONArray array = new JSONArray(response.contentAsString());
-
-                    global.currentState = array.getJSONObject(0).getString("state");
-                    global.currentLevel = Float.valueOf(array.getJSONObject(0).getString("distance"));
-
-                    /*
-                    *   Non appena la connessione bluetooth si è istaurata, invio lo stato corrente al server.
-                    */
-
-                    if(bluetooth.btChannel != null)
-                        bluetooth.sendMessage(array.getJSONObject(0).getString("state"));
-
-                    for(int i=0;i<array.length();i++)
-                    {
-                        sampleData = new DataReceived(Float.valueOf(array.getJSONObject(i).getString("distance")),
-                                                        array.getJSONObject(i).getString("state"),
-                                                        array.getJSONObject(i).getString("time"),
-                                                        array.getJSONObject(i).getInt("open-angle"));
-
-                        dataReceiveds.add(sampleData);
-                    }
-
-                    modifyItemsOnUI(oldView);
-
-                } catch (IOException | JSONException e) {
-                    e.printStackTrace();
-                }
+                fillArrayWithNewData(response);
             }
         });
     }
 
+
     public ArrayList<DataReceived> getDataReceiveds() {
         return dataReceiveds;
+    }
+
+    public void tryHttpGetDataSync(){
+
+        dataReceiveds = new ArrayList<DataReceived>();
+        fillArrayWithNewData(Http.HTTPSync(global.url));
+    }
+
+    public void fillArrayWithNewData(HttpResponse response){
+        try {
+            JSONArray array = new JSONArray(response.contentAsString());
+
+            global.currentState = array.getJSONObject(0).getString("state");
+            global.currentLevel = Float.valueOf(array.getJSONObject(0).getString("distance"));
+
+            /*
+             *   Non appena la connessione bluetooth si è istaurata, invio lo stato corrente al server.
+             */
+
+            for(int i=0;i<array.length();i++)
+            {
+                sampleData = new DataReceived(Float.valueOf(array.getJSONObject(i).getString("distance")),
+                        array.getJSONObject(i).getString("state"),
+                        array.getJSONObject(i).getString("time"),
+                        array.getJSONObject(i).getInt("open-angle"));
+
+                dataReceiveds.add(sampleData);
+            }
+        } catch (IOException | JSONException e) {
+            e.printStackTrace();
+        }
     }
 }

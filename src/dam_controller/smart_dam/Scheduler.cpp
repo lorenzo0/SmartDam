@@ -3,7 +3,7 @@
 double newOpeningDAM = -1;
 MsgServiceBT msgServiceBLUETOOTH(2,3);
 
-void Scheduler::init(int pinRX, int pinTX){
+void Scheduler::init(){
   nTasks = 0;
   indexCurrentTaskActive = 0;
   msgServiceBLUETOOTH.init(); 

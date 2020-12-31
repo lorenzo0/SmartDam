@@ -22,8 +22,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="it.unibo.isi.seeiot.dam_app.UserInterface"
-            android:parentActivityName="it.unibo.isi.seeiot.dam_app.SplashActivity"/>
+        <activity android:name="it.unibo.isi.seeiot.dam_app.UserInterface"/>
         <activity
             android:name="it.unibo.isi.seeiot.dam_app.ShowHistoricalData"
             android:parentActivityName="it.unibo.isi.seeiot.dam_app.UserInterface" />

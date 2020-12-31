@@ -15,7 +15,7 @@ class Scheduler {
   Task* taskObject;
 
 public:
-  void init(int pinRX, int pinTX);  
+  void init();  
   virtual bool addTask(Task* task);  
   virtual void schedule();
   void setIndexCurrentTaskActive(int index);
@@ -25,7 +25,6 @@ public:
 private:
   int indexCurrentTaskActive;
   long period;
-  int pinRX, pinTX;
 };
 
 /*0 è idle

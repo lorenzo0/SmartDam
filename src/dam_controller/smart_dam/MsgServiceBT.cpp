@@ -11,7 +11,7 @@ void MsgServiceBT::init(){
   channel->begin(9600);
   availableMsg = NULL;
 
-  channel -> print("AT+NAMEDamBluetoothCommunicator");
+  channel -> print("AT+NAMEIsi00");
 }
 
 bool MsgServiceBT::sendMsg(MsgBT MsgBT){

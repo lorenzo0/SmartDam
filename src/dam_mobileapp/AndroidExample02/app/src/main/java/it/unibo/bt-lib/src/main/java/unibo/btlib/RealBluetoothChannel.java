@@ -8,11 +8,12 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.Arrays;
 
 import unibo.btlib.utils.C;
 
-public final class RealBluetoothChannel extends BluetoothChannel {
+public final class RealBluetoothChannel extends BluetoothChannel implements Serializable {
 
     private String remoteDeviceName;
 

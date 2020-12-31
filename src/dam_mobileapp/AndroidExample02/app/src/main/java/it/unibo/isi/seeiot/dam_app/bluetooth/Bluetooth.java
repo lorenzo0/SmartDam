@@ -6,6 +6,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 import it.unibo.isi.seeiot.dam_app.utils.global;
@@ -15,7 +16,7 @@ import unibo.btlib.ConnectToBluetoothServerTask;
 import unibo.btlib.ConnectionTask;
 import unibo.btlib.exceptions.BluetoothDeviceNotFound;
 
-public class Bluetooth extends AppCompatActivity {
+public class Bluetooth extends AppCompatActivity implements Serializable {
 
     public BluetoothChannel btChannel;
 
@@ -34,7 +35,6 @@ public class Bluetooth extends AppCompatActivity {
         new ConnectToBluetoothServerTask(serverDevice, uuid, new ConnectionTask.EventListener() {
             @Override
             public void onConnectionActive(final BluetoothChannel channel) {
-
                 Toast.makeText(context,"Connected to server on device "+serverDevice.getName(), Toast.LENGTH_LONG).show();
                 btChannel = channel;
             }

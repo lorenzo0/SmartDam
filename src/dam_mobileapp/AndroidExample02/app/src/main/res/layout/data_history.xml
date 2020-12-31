@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="Non ci sono dati da visualizzare..."
-        tools:layout_editor_absoluteX="101dp"
-        tools:layout_editor_absoluteY="356dp" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

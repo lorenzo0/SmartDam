@@ -26,7 +26,7 @@ public class HttpResponse {
         return readStream(response);
     }
 
-    private String readStream(final InputStream in) throws IOException {
+    public String readStream(final InputStream in) throws IOException {
         final StringBuilder response = new StringBuilder();
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {

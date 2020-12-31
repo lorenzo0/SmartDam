@@ -45,19 +45,26 @@ public class UserInterface extends AppCompatActivity {
 
         bluetoothConn = new Bluetooth();
         alerHandler = new handlerAlert();
-        httpRequests = new HTTPRequests();
+
+        Bundle extras = getIntent().getExtras();
+        if (extras != null)
+            httpRequests = (HTTPRequests) getIntent().getSerializableExtra("httpReq");
+
+
+        modalitySwitch = (Switch) findViewById(R.id.switch1);
+        currentView = findViewById(R.id.angle).getRootView();
+        checkOnCreate = true;
 
         final BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
         if (btAdapter != null && !btAdapter.isEnabled()) {
             startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), global.bluetooth.ENABLE_BT_REQUEST);
         }
 
-        modalitySwitch = (Switch) findViewById(R.id.switch1);
-        currentView = findViewById(R.id.angle).getRootView();
-        checkOnCreate = true;
-
         initUI();
-        httpRequests.tryHttpGetHData(currentView, bluetoothConn);
+        connectBT();
+        //da gestire se array è vuoto, rifaccio la richiesta
+        if(httpRequests.getDataReceiveds().size() != 0)
+            httpRequests.modifyItemsOnUI(currentView, bluetoothConn);
     }
 
     /*
@@ -74,6 +81,7 @@ public class UserInterface extends AppCompatActivity {
         super.onResume();
         if(!(checkOnCreate))
             httpRequests.tryHttpGetHData(currentView, bluetoothConn);
+
         checkOnCreate = false;
         createCountDown(5000);
     }
@@ -81,8 +89,17 @@ public class UserInterface extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        bluetoothConn.closeConnection();
+        if(bluetoothConn.btChannel != null)
+            bluetoothConn.closeConnection();
         checkOnCreate = true;
+    }
+
+    protected void connectBT(){
+        try {
+            bluetoothConn.connectToBTServer(getApplicationContext());
+        } catch (unibo.btlib.exceptions.BluetoothDeviceNotFound bluetoothDeviceNotFound) {
+            bluetoothDeviceNotFound.printStackTrace();
+        }
     }
 
     private void initUI() {
@@ -103,9 +120,10 @@ public class UserInterface extends AppCompatActivity {
 
         findViewById(R.id.info_button).setOnClickListener(v -> {
             Intent intent = new Intent(this, ShowHistoricalData.class);
-            Bundle args = new Bundle();
-            args.putSerializable("ARRAYLIST",(Serializable)httpRequests.getDataReceiveds());
-            intent.putExtra("BUNDLE",args);
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("httpReq", httpRequests);
+            bundle.putSerializable("bluetooth", bluetoothConn);
+            intent.putExtras(bundle);
             startActivity(intent);
         });
 
@@ -125,9 +143,13 @@ public class UserInterface extends AppCompatActivity {
                     @Override
                     public void run() {
                         //Toast.makeText(getApplicationContext(),"Finito!",Toast.LENGTH_SHORT).show();
-                        Log.d("PROVA-TEST", Boolean.toString(global.mod_op));
                         if(!(global.mod_op))
                             httpRequests.tryHttpGetHData(currentView, bluetoothConn);
+
+                        if(bluetoothConn.btChannel != null)
+                            Log.d("THREAD-TXT", bluetoothConn.btChannel.toString());
+                        else
+                            Log.d("THREAD-TXT", "false");
                         createCountDown(numberMilliSec);
                     }
                 });

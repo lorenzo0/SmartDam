@@ -3,7 +3,9 @@ package it.unibo.isi.seeiot.dam_app.netutils;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class DataReceived implements Comparable<DataReceived>, Parcelable {
+import java.io.Serializable;
+
+public class DataReceived implements Comparable<DataReceived>, Parcelable, Serializable {
     private float distance;
     private String state, time;
     private int angle;
