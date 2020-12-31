@@ -1,8 +1,8 @@
 #include "Arduino.h"
-#include "MsgService.h"
+#include "MsgServiceSERIAL.h"
 
 String content;
-MsgServiceClass MsgService;
+MsgServiceClass MsgServiceSERIAL;
 
 bool MsgServiceClass::isMsgAvailable(){
   return msgAvailable;
@@ -37,8 +37,8 @@ void serialEvent() {
   while (Serial.available()) {
     char ch = (char) Serial.read();
     if (ch == '\n'){
-      MsgService.currentMsg = new Msg(content);
-      MsgService.msgAvailable = true;      
+      MsgServiceSERIAL.currentMsg = new Msg(content);
+      MsgServiceSERIAL.msgAvailable = true;      
     } else {
       content += ch;      
     }

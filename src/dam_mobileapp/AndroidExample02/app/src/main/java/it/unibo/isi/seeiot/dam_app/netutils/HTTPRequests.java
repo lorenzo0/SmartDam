@@ -31,7 +31,7 @@ public class HTTPRequests implements Serializable {
 
     public HTTPRequests(){
     }
-
+    /* Ready for httpPost */
     public void tryHttpPostLog(String message) throws JSONException {
         final String content = new JSONObject()
                 .put("sender", "APP")
@@ -55,7 +55,7 @@ public class HTTPRequests implements Serializable {
         Http.post(global.url, content.getBytes(), response -> {
             if(response.code() == HttpURLConnection.HTTP_OK && bluetoothConn.btChannel != null) {
                 Toast.makeText(context, "Dati inviati correttamente al server!", Toast.LENGTH_LONG).show();
-                bluetoothConn.sendMessage("New opening: " + finalData);
+                bluetoothConn.sendMessage(Integer.toString(finalData));
             }else
                 Toast.makeText(context,"Si è verificato un problema, i dati NON sono stati inviati al server!", Toast.LENGTH_LONG).show();
         });
@@ -116,7 +116,7 @@ public class HTTPRequests implements Serializable {
         }
     }
 
-    public void tryHttpGetHData(View oldView){
+    public void tryHttpGetHData(View oldView, Bluetooth bluetooth){
 
         dataReceiveds = new ArrayList<DataReceived>();
 
@@ -127,6 +127,13 @@ public class HTTPRequests implements Serializable {
 
                     global.currentState = array.getJSONObject(0).getString("state");
                     global.currentLevel = Float.valueOf(array.getJSONObject(0).getString("distance"));
+
+                    /*
+                    *   Non appena la connessione bluetooth si è istaurata, invio lo stato corrente al server.
+                    */
+
+                    if(bluetooth.btChannel != null)
+                        bluetooth.sendMessage(array.getJSONObject(0).getString("state"));
 
                     for(int i=0;i<array.length();i++)
                     {

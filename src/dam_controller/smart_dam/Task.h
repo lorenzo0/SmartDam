@@ -7,7 +7,6 @@ class Task {
 private: 
 
   int timeElapsed;
-  boolean completed;
   
 public:
 
@@ -26,26 +25,9 @@ public:
   
   
   virtual void init(){
-    completed = false;
     timeElapsed = 0;
   }
 
-
-  void setCompleted(boolean setState){
-    this -> completed = setState;
-  }
-
-  void setNextTask(int nameNextTask){
-    this -> nameNextTask = nameNextTask;
-  }
-
-  int getNextTask(){
-    return nameNextTask;
-  }
-  
-  bool isCompleted(){
-    return completed;
-  }
 
   bool isFirstRun(){
     return firstRun;

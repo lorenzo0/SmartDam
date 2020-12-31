@@ -1,15 +1,15 @@
-#ifndef __NORMALSTATE__
-#define __NORMALSTATE__
+#ifndef __NORMALPRESTATE__
+#define __NORMALPRESTATE__
 
 #include "Task.h"
 #include "Led.h"
 #include "Globals.h"
 
-class NormalState: public Task{  
+class NormalPreState: public Task{  
 
 public: 
 
-  NormalState(int pinLed1);
+  NormalPreState(int pinLed1);
   void init();  
   void tick();
   void checkDistance();

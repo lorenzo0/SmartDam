@@ -67,26 +67,30 @@ public class UserInterface extends AppCompatActivity {
         }
     }
 
+    /*
+    *  Handling Life-Cicly Activity
+    */
+
     @Override
     protected void onStart() {
         super.onStart();
-        httpRequests.tryHttpGetHData(currentView);
-        //httpRequests.modifyItemsOnUI(currentView);
+        httpRequests.tryHttpGetHData(currentView, bluetoothConn);
     }
-
 
     @Override
     protected void onResume() {
         super.onResume();
         if(!(checkOnCreate))
-            httpRequests.tryHttpGetHData(currentView);
+            httpRequests.tryHttpGetHData(currentView, bluetoothConn);
         checkOnCreate = false;
         createCountDown(5000);
+        connectBT();
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
+        bluetoothConn.closeConnection();
         checkOnCreate = true;
     }
 
@@ -95,9 +99,10 @@ public class UserInterface extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked) {
                     if (global.currentState.equals("ALLARM")) {
-                        connectBT();
+                        bluetoothConn.sendMessage("MOD-OP");
+                        global.mod_op = true;
                         alerHandler.showAlert(UserInterface.this, currentView, httpRequests, bluetoothConn);
-                    }else {
+                    }else{
                         alerHandler.showWarningAlert(UserInterface.this);
                         modalitySwitch.setChecked(false);
                     }
@@ -129,9 +134,9 @@ public class UserInterface extends AppCompatActivity {
                     @Override
                     public void run() {
                         //Toast.makeText(getApplicationContext(),"Finito!",Toast.LENGTH_SHORT).show();
-                        httpRequests.tryHttpGetHData(currentView);
-                        /*if(httpRequests.getDataReceiveds().size() != 0)
-                            httpRequests.modifyItemsOnUI(currentView);*/
+                        Log.d("PROVA-TEST", Boolean.toString(global.mod_op));
+                        if(!(global.mod_op))
+                            httpRequests.tryHttpGetHData(currentView, bluetoothConn);
                         createCountDown(numberMilliSec);
                     }
                 });

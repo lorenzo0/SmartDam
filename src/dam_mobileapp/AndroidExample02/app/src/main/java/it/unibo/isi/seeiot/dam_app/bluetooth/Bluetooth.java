@@ -25,8 +25,9 @@ public class Bluetooth extends AppCompatActivity {
         final BluetoothDevice serverDevice = BluetoothUtils.getPairedDeviceByName(global.bluetooth.BT_DEVICE_ACTING_AS_SERVER_NAME);
         /*
          *  decido di non utilizzare il generatore (randomica oppure a partire da una stringa) di UUID
-         *  dato che utilizzo il default UUID per gli embeddedDevice. Questo mi è possibile perchè il mio
-         *  server è un attutatore Android che mi permette di comuncare APP - ARDUINO
+         *  dato che utilizzo il default UUID per gli embeddedDevice. Questo mi è possibile perchè i due device
+         *  che devono comunicare NON possono esplicitare e quindi condividere lo stesso UUID.
+         *  L'UUID utilizzato è presentato come convenzione ad-hoc per embedded system
         */
         final UUID uuid = BluetoothUtils.getEmbeddedDeviceDefaultUuid();
 
@@ -44,6 +45,11 @@ public class Bluetooth extends AppCompatActivity {
             }
         }).execute();
     }
+
+    public void closeConnection(){
+        btChannel.close();
+    }
+
 
     public void sendMessage(String message){
         btChannel.sendMessage(message);

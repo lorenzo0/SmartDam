@@ -10,6 +10,8 @@ void MsgServiceBT::init(){
   content.reserve(256);
   channel->begin(9600);
   availableMsg = NULL;
+
+  channel -> print("AT+NAMEDamBluetoothCommunicator");
 }
 
 bool MsgServiceBT::sendMsg(MsgBT MsgBT){

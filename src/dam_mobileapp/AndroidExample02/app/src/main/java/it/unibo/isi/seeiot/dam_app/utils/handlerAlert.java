@@ -60,13 +60,15 @@ public class handlerAlert {
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
+                                global.mod_op = false;
                             }
                         }
                 )
                 .setNegativeButton("Cancel",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                //((Switch)oldView.findViewById(R.id.switch1)).setChecked(false);
+                                ((Switch)oldView.findViewById(R.id.switch1)).setChecked(false);
+                                global.mod_op = false;
                                 dialog.dismiss();
                             }
                         }

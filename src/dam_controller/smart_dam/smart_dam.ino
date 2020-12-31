@@ -16,9 +16,8 @@
  */ 
 
 #define LED_UNO 10
-#define HC_RX 2
-#define HC_TX 3
-/*#define SERVO_MOTOR 9*/
+#define SERVO_MOTOR 9
+
 /* Grazie a softwareSerial è possibile instaurare una comunicazione di tipo seriale ASINCRONO
 con qualsiasi coppia di pin digitali
 
@@ -26,16 +25,19 @@ rdx di arduino comunica con tdx di hc-06*/
 
 #define CALIBRATION_TIME_SEC 10
 #include "Scheduler.h"
-#include "MsgService.h"
 #include "servo_motor_impl.h"
 #include "Globals.h"
-#include "MsgServiceBT.h"
+#include "MsgServiceSERIAL.h"
+#include "NormalPreState.h"
+#include "AllarmState.h"
+#include "ModifyState.h"
 #include <SoftwareSerial.h>
 
 Scheduler scheduler;
 ServoMotor* pMotor;
-MsgServiceBT msgService(HC_RX, HC_TX);
 String bluethoot_message;
+
+Task* allarmState;
 
 /* 
  *  In setup viene prevista una calibratura dei sensori, in particolare
@@ -50,12 +52,10 @@ void setup(){
   pinMode(LED_UNO,OUTPUT);
 
   Serial.begin(9600);
-  msgService.init();  
 
   while (!Serial){}
   Serial.println("ready to go."); 
-
-  //msgService.print("AT+NAMEDamBluetoothCommunicator");
+  Led* led_uno = new Led(LED_UNO);
   
   /*pMotor = new ServoMotorImpl(9);
   
@@ -75,35 +75,25 @@ void setup(){
   delay(200);*/
 
   
-  scheduler.init();
-  MsgService.init();
+  scheduler.init(2,3);
+  MsgServiceSERIAL.init();
+
+  Task* normalPreState = new NormalPreState(LED_UNO);
+  Task* allarmState = new AllarmState(LED_UNO,SERVO_MOTOR);
+  Task* modifyState = new ModifyState(LED_UNO);
 
   /* Nel normalState, la rilevazione viene effettuata una volta ogni 10 secondi*/
-  //normalState -> init();
+  normalPreState -> init();
+  allarmState -> init();
+  modifyState -> init();
 
-  //scheduler.setIndexCurrentTaskActive(0);
+  scheduler.addTask(normalPreState);
+  scheduler.addTask(allarmState);
+  scheduler.addTask(modifyState);
 
-  //scheduler.addTask(normalState);
-
+  led_uno -> switchOff();
 }
 
 void loop() {
-  //scheduler.schedule();
-  bluethoot_conversation();
-}
-
-/* WORKING */
-void bluethoot_conversation(){
-   if (msgService.isMsgAvailable()) {
-    MsgBT* MsgReceivedBT = msgService.receiveMsg();
-    Serial.println(MsgReceivedBT->getContent()); 
-
-    /*if(MsgReceivedBT->getContent() == "H")
-      digitalWrite(LED_UNO, HIGH);
-    else if(MsgReceivedBT->getContent() == "L")
-      digitalWrite(LED_UNO, LOW);*/
-      //msgService.sendMsg(Msg("pong")); Può essere utilizzato per inviare messaggi al mobile
-       
-    delete MsgReceivedBT;
-  }
+  scheduler.schedule();
 }

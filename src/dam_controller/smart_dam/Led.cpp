@@ -18,7 +18,16 @@ void Led::switchOff(){
 
 /* Gestione Blinking Led */
 void Led::blinking(){
-  time = millis();
-  fadeValue = 128+127*cos(2*PI/2000*time);
-  analogWrite(pin, fadeValue);
+  
+  for(int i=0; i<17; i++){
+    fadeValue += 15;
+    analogWrite(pin, fadeValue);
+    delay(50);
+  }
+
+  for(int i=17; i>0; i--){
+    fadeValue -= 15;
+    analogWrite(pin, fadeValue);
+    delay(50);
+  }
 }

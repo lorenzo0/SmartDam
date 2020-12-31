@@ -2,6 +2,7 @@
 #define __SCHEDULER__
 
 #include "Task.h"
+#include "MsgServiceBT.h"
 
 #define MAX_TASKS 50
 
@@ -14,16 +15,17 @@ class Scheduler {
   Task* taskObject;
 
 public:
-  void init();  
+  void init(int pinRX, int pinTX);  
   virtual bool addTask(Task* task);  
   virtual void schedule();
-  virtual void redirectTask(int nextState);
   void setIndexCurrentTaskActive(int index);
+  void bluethoot_receiving();
+  void setNewOpeningDAM(double value);
 
 private:
   int indexCurrentTaskActive;
-  int i;
   long period;
+  int pinRX, pinTX;
 };
 
 /*0 è idle

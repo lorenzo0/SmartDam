@@ -1,9 +1,12 @@
 #include "Scheduler.h"
 
-void Scheduler::init(){
+double newOpeningDAM = -1;
+MsgServiceBT msgServiceBLUETOOTH(2,3);
+
+void Scheduler::init(int pinRX, int pinTX){
   nTasks = 0;
-  i = 0;
   indexCurrentTaskActive = 0;
+  msgServiceBLUETOOTH.init(); 
 }
 
 bool Scheduler::addTask(Task* task){
@@ -35,47 +38,49 @@ bool Scheduler::addTask(Task* task){
  *  La variabile 'i' è stata introdotta per rendere il codice più leggibile, sostituendo 'indexCurrentTaskActive'
 */
 void Scheduler::schedule(){  
-  i = indexCurrentTaskActive;
-      
-   if(taskList[i]->isCompleted()){
-      Scheduler::redirectTask(taskList[i] -> getNextTask());
-      taskList[i]->setCompleted(false);
-  }else
-    taskList[i] -> tick();
-  
+  bluethoot_receiving();    
+  taskList[indexCurrentTaskActive] -> tick();
 }
 
 /*
- * In questa procedura viene gestita la corrispondenza del prossimo task che dovrà
- * essere mandato in esecuzione dallo scheduler. Ogni task imposta il suo nextTask in base a
- * come è stato terminato il task (completed/interrupted). 
- * Le corrispondenze prima menzionate sono:
- *    - 0 è idle
- *    - 1 è error
- *    - 2 sleep
- *    - 3 running
- *    
- * Queste, vengono definite in base all'inserimento dei task nell'oggetto task
- * nel file smart_exp.ino
- */
+ * Dato che non è possibile fare uno switch analizzando il valore di una stringa,
+ * viene strutturato un pattern basato su interi.
+ * 
+ * Normale o Pre-Allarme (Il loro comportamento è identico, quindi li gestisco
+ * in una sola classe) 0
+ * Allarme 1
+ * Modalità di modifica 2 (Successiva SOLO allo stato allarme
+*/
 
-void Scheduler::redirectTask(int nextState){
-  switch(nextState){
-    case 0:
-      setIndexCurrentTaskActive(0);
-      //MsgService.sendMsg("NORMAL");
-      break;
-    case 1:
-      setIndexCurrentTaskActive(1);
-      //MsgService.sendMsg("PRE-ALLARM");
-      break;
-     case 2:
-      setIndexCurrentTaskActive(2);
-      //MsgService.sendMsg("ALLARM");
-      break;
+
+void Scheduler::bluethoot_receiving(){
+   if (msgServiceBLUETOOTH.isMsgAvailable()) {
+    MsgBT* MsgReceivedBT = msgServiceBLUETOOTH.receiveMsg();
+    String messageReceived = MsgReceivedBT->getContent();
+    Serial.println("Message received: "+messageReceived);
+
+    if(messageReceived == "NORMAL" || 
+        messageReceived == "PRE-ALLARM")
+          setIndexCurrentTaskActive(0);
+      else if(messageReceived == "ALLARM")
+          setIndexCurrentTaskActive(1);
+      else if(messageReceived == "MOD-OP")
+          setIndexCurrentTaskActive(2);
+    else  
+      setNewOpeningDAM(messageReceived.toDouble());
+    
+       
+    delete MsgReceivedBT;
+    messageReceived = "";
   }
 }
 
 void Scheduler::setIndexCurrentTaskActive(int index){
   this->indexCurrentTaskActive = index;
+  Serial.println("Prossima Task in esecuzione: "+ (String) index);
+}
+
+void Scheduler::setNewOpeningDAM(double value){
+  newOpeningDAM = value;
+  Serial.println((String) value + "Setted!");
 }

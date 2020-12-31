@@ -1,18 +1,17 @@
-#ifndef __PREALLARMSTATE__
-#define __PREALLARMSTATE__
+#ifndef __MODIFYSTATE__
+#define __MODIFYSTATE__
 
 #include "Task.h"
 #include "Led.h"
 #include "Globals.h"
 
-class PreAllarmState: public Task{  
+class ModifyState: public Task{  
 
 public: 
 
-  PreAllarmState(int pinLed1);
+  ModifyState(int pinLed1);
   void init();  
   void tick();
-  void sendDataHTTP();
 
 private:
 

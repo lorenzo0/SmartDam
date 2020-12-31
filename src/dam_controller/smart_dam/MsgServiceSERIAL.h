@@ -1,5 +1,5 @@
-#ifndef __MSGSERVICE__
-#define __MSGSERVICE__
+#ifndef __MSGSERVICESERIAL__
+#define __MSGSERVICESERIAL__
 
 #include "Arduino.h"
 
@@ -39,6 +39,6 @@ public:
 };
 
 /* condivisione variabile all'esterno della classe stessa */
-extern MsgServiceClass MsgService;
+extern MsgServiceClass MsgServiceSERIAL;
 
 #endif
