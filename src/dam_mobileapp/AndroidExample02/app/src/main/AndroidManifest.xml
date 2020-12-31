@@ -16,13 +16,14 @@
         android:usesCleartextTraffic="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name="it.unibo.isi.seeiot.dam_app.UserInterface">
+        <activity android:name="it.unibo.isi.seeiot.dam_app.SplashActivity" android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="it.unibo.isi.seeiot.dam_app.UserInterface"
+            android:parentActivityName="it.unibo.isi.seeiot.dam_app.SplashActivity"/>
         <activity
             android:name="it.unibo.isi.seeiot.dam_app.ShowHistoricalData"
             android:parentActivityName="it.unibo.isi.seeiot.dam_app.UserInterface" />

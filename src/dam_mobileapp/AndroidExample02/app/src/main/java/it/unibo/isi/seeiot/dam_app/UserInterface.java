@@ -57,14 +57,7 @@ public class UserInterface extends AppCompatActivity {
         checkOnCreate = true;
 
         initUI();
-    }
-
-    protected void connectBT(){
-        try {
-            bluetoothConn.connectToBTServer(UserInterface.this);
-        } catch (BluetoothDeviceNotFound bluetoothDeviceNotFound) {
-            bluetoothDeviceNotFound.printStackTrace();
-        }
+        httpRequests.tryHttpGetHData(currentView, bluetoothConn);
     }
 
     /*
@@ -74,7 +67,6 @@ public class UserInterface extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        httpRequests.tryHttpGetHData(currentView, bluetoothConn);
     }
 
     @Override
@@ -84,7 +76,6 @@ public class UserInterface extends AppCompatActivity {
             httpRequests.tryHttpGetHData(currentView, bluetoothConn);
         checkOnCreate = false;
         createCountDown(5000);
-        connectBT();
     }
 
     @Override
