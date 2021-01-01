@@ -8,15 +8,15 @@ bool MsgServiceClass::isMsgAvailable(){
   return msgAvailable;
 }
 
-Msg* MsgServiceClass::receiveMsg(){
+String MsgServiceClass::receiveMsg(){
   if (msgAvailable){
     Msg* msg = currentMsg;
     msgAvailable = false;
     currentMsg = NULL;
-    content = "";
-    return msg;  
+    content =  msg -> getContent();
+    return content;  
   } else {
-    return NULL; 
+    return ""; 
   }
 }
 

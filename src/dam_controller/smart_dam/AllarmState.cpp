@@ -1,7 +1,7 @@
 #include "AllarmState.h"
 #include "Arduino.h"
 
-extern double newOpeningDAM;
+extern int newOpeningDAM;
 
 AllarmState::AllarmState(int pinLed1, int pinServo){
   this -> pinLed1 = pinLed1;
@@ -19,14 +19,28 @@ void AllarmState::init(){
 
 void AllarmState::tick(){
   led1 -> blinking();
-
-  //Serial.println("New opening on Allarm State: "+ (String) newOpeningDAM); lo vede correttamente
-
-  if(newOpeningDAM != -1){
+  
+  if(newOpeningDAM != -1 && newOpeningDAM != oldValue){
     oldValue = newOpeningDAM;
-    pMotor -> setPosition(oldValue);
-  }else if(newOpeningDAM != -1 && newOpeningDAM != oldValue){
-    oldValue = newOpeningDAM;
-    pMotor -> setPosition(oldValue);
+    Serial.println("OldValue = "+ String(newOpeningDAM));
+    int newOpeningToServo = sharingMethods -> calculateOpeningServo(newOpeningDAM);
+    Serial.println("newOpening = "+ String(oldValue));
+    
+    if(newOpeningToServo > oldOpeningServo){
+      pMotor->on();  
+      for (int i = oldOpeningServo; i < newOpeningToServo; i++) {
+        pMotor->setPosition(i);         
+        delay(15);
+      }
+     pMotor->off();
+    }else{
+      pMotor->on();  
+      for (int i = newOpeningToServo; i < oldOpeningServo; i++) {
+        pMotor->setPosition(i);         
+        delay(15);
+      }
+     pMotor->off();
+    }
+      delay(500);
   }
 }

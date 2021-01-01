@@ -1,6 +1,6 @@
 #include "Scheduler.h"
 
-double newOpeningDAM = -1;
+int newOpeningDAM = -1;
 MsgServiceBT msgServiceBLUETOOTH(2,3);
 
 void Scheduler::init(){
@@ -38,7 +38,10 @@ bool Scheduler::addTask(Task* task){
  *  La variabile 'i' è stata introdotta per rendere il codice più leggibile, sostituendo 'indexCurrentTaskActive'
 */
 void Scheduler::schedule(){  
-  bluethoot_receiving();    
+  if(indexCurrentTaskActive == 2)
+    bluethoot_receiving();  
+  if(indexCurrentTaskActive == 1)    
+    checkMessageReceivedSERIAL();
   taskList[indexCurrentTaskActive] -> tick();
 }
 
@@ -75,12 +78,20 @@ void Scheduler::bluethoot_receiving(){
   }
 }
 
+void Scheduler::checkMessageReceivedSERIAL(){
+  if(MsgServiceSERIAL.isMsgAvailable()){
+    String msgReceiveSERIAL = MsgServiceSERIAL.receiveMsg();
+    setNewOpeningDAM(msgReceiveSERIAL.toDouble());
+  }
+}
+
 void Scheduler::setIndexCurrentTaskActive(int index){
   this->indexCurrentTaskActive = index;
   Serial.println("Prossima Task in esecuzione: "+ (String) index);
 }
 
-void Scheduler::setNewOpeningDAM(double value){
+void Scheduler::setNewOpeningDAM(int value){
   newOpeningDAM = value;
-  Serial.println((String) value + "Setted!");
+  //Serial.println((String) value + "Setted!");
+  //sarebbe nel log questo
 }

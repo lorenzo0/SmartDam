@@ -10,8 +10,6 @@ Arduino legge i dati del server
 
 Arduino legge i dati da bluethoot
 	- Modifica l'apertura della diga
-	- Appena fatto, invia queste informazioni tramite seriale 
-		- Apertura diga (M)
 
 APP legge i dati del server
 	- modifica i valori della sua interfaccia
@@ -22,7 +20,7 @@ APP legge i dati del server
 
 APP quando è in stato modifica, invia dati al server
 	- Avendo l'ultimo valore dato dal server, lo modifica
-	- Una volta modificato, invia dati a bluethoot
+	- Una volta modificato, invia dati a bluethoot ed al server
 
 Server
 	- gestisce la memorizzazione dei dati in LinkedList

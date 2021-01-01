@@ -34,7 +34,7 @@ public:
   void sendMsg(const String& msg);
   bool isMsgAvailable();
   bool isMsgAvailable(Pattern& pattern);
-  Msg* receiveMsg();
+  String receiveMsg();
   Msg* receiveMsg(Pattern& pattern);
 };
 

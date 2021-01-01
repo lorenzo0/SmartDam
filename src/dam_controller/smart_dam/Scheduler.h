@@ -3,6 +3,7 @@
 
 #include "Task.h"
 #include "MsgServiceBT.h"
+#include "MsgServiceSERIAL.h"
 
 #define MAX_TASKS 50
 
@@ -20,7 +21,8 @@ public:
   virtual void schedule();
   void setIndexCurrentTaskActive(int index);
   void bluethoot_receiving();
-  void setNewOpeningDAM(double value);
+  void setNewOpeningDAM(int value);
+  void checkMessageReceivedSERIAL();
 
 private:
   int indexCurrentTaskActive;

@@ -57,9 +57,9 @@ void setup(){
   Serial.println("ready to go."); 
   Led* led_uno = new Led(LED_UNO);
   
-  /*pMotor = new ServoMotorImpl(9);
+  pMotor = new ServoMotorImpl(9);
   
-  MsgService.sendMsg("CALIBRATION");
+  MsgServiceSERIAL.sendMsg("CALIBRATION");
   pMotor->on();  
     for (int i = 0; i < 180; i++) {
       pMotor->setPosition(i);         
@@ -72,17 +72,16 @@ void setup(){
    pMotor->off();
   
   Serial.println("SENSORS READY.");
-  delay(200);*/
+  delay(200);
 
   
   scheduler.init();
   MsgServiceSERIAL.init();
 
   Task* normalPreState = new NormalPreState(LED_UNO);
-  Task* allarmState = new AllarmState(LED_UNO,SERVO_MOTOR);
-  Task* modifyState = new ModifyState(LED_UNO);
+  Task* allarmState = new AllarmState(LED_UNO, SERVO_MOTOR);
+  Task* modifyState = new ModifyState(LED_UNO, SERVO_MOTOR);
 
-  /* Nel normalState, la rilevazione viene effettuata una volta ogni 10 secondi*/
   normalPreState -> init();
   allarmState -> init();
   modifyState -> init();

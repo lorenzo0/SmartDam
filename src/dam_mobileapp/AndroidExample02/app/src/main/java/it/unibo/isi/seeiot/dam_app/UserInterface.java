@@ -94,9 +94,15 @@ public class UserInterface extends AppCompatActivity {
         checkOnCreate = true;
     }
 
+    /*
+    * OnCreate di UserInterface viene invocato anche nel caso si passi da ShowHistoricalData,
+    * quindi se non riesce a mantenere la connessione, allora ri-chiedo la connessione
+    * all'embedded system.
+    */
     protected void connectBT(){
         try {
-            bluetoothConn.connectToBTServer(getApplicationContext());
+            if(bluetoothConn.btChannel==null)
+                bluetoothConn.connectToBTServer(getApplicationContext());
         } catch (unibo.btlib.exceptions.BluetoothDeviceNotFound bluetoothDeviceNotFound) {
             bluetoothDeviceNotFound.printStackTrace();
         }
