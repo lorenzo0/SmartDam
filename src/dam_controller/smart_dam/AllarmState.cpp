@@ -14,17 +14,14 @@ void AllarmState::init(){
   led1 = new Led(pinLed1);
   pMotor = new ServoMotorImpl(pinServo);
   
-  Task::setFirstRun(false);
 }
 
 void AllarmState::tick(){
-  led1 -> blinking();
+  led1 -> switchOn();
   
   if(newOpeningDAM != -1 && newOpeningDAM != oldValue){
     oldValue = newOpeningDAM;
-    Serial.println("OldValue = "+ String(newOpeningDAM));
     int newOpeningToServo = sharingMethods -> calculateOpeningServo(newOpeningDAM);
-    Serial.println("newOpening = "+ String(oldValue));
     
     if(newOpeningToServo > oldOpeningServo){
       pMotor->on();  
@@ -35,12 +32,11 @@ void AllarmState::tick(){
      pMotor->off();
     }else{
       pMotor->on();  
-      for (int i = newOpeningToServo; i < oldOpeningServo; i++) {
+      for (int i = newOpeningToServo; i > oldOpeningServo; i--) {
         pMotor->setPosition(i);         
         delay(15);
       }
      pMotor->off();
     }
-      delay(500);
   }
 }

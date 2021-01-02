@@ -33,9 +33,7 @@ public:
   void init();  
   void sendMsg(const String& msg);
   bool isMsgAvailable();
-  bool isMsgAvailable(Pattern& pattern);
   String receiveMsg();
-  Msg* receiveMsg(Pattern& pattern);
 };
 
 /* condivisione variabile all'esterno della classe stessa */

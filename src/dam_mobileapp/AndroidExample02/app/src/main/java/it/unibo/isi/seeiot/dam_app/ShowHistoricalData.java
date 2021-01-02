@@ -43,13 +43,11 @@ public class ShowHistoricalData extends AppCompatActivity {
 
         recyclerView.setAdapter(new StorageDataAdapter(httpRequests.getDataReceiveds()));
 
-        // The callback can be enabled or disabled here or in handleOnBackPressed()
-
         initUI();
     }
 
     private void initUI() {
-        if(dataReceiveds.size() != 0)
+        if(httpRequests.getDataReceiveds().size() != 0)
             findViewById(R.id.motivation_message).setVisibility(View.GONE);
     }
 

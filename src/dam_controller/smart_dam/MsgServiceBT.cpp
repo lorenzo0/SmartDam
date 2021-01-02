@@ -11,7 +11,7 @@ void MsgServiceBT::init(){
   channel->begin(9600);
   availableMsg = NULL;
 
-  channel -> print("AT+NAMEIsi00");
+  channel -> print("AT+NAMESmartDamConn");
 }
 
 bool MsgServiceBT::sendMsg(MsgBT MsgBT){
@@ -32,12 +32,12 @@ bool MsgServiceBT::isMsgAvailable(){
   return false;  
 }
 
-MsgBT* MsgServiceBT::receiveMsg(){
+String MsgServiceBT::receiveMsg(){
   if (availableMsg != NULL){
     MsgBT* MsgBT = availableMsg;
     availableMsg = NULL;
-    return MsgBT;  
+    return MsgBT -> getContent();  
   } else {
-    return NULL;
+    return "";
   }
 }

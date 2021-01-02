@@ -89,10 +89,10 @@ public class StorageDataAdapter extends RecyclerView.Adapter<StorageDataAdapter.
         String x = "ciao";
         viewHolder.getDateTextView().setText(x);
         if(historicalData.size() >= position) {
-            viewHolder.getAngleTextView().setText(Integer.toString(historicalData.get(position).getAngle()));
+            viewHolder.getAngleTextView().setText("Opening Dam: "+Integer.toString(historicalData.get(position).getAngle()));
             viewHolder.getStateTextView().setText(historicalData.get(position).getState());
             viewHolder.getDateTextView().setText(historicalData.get(position).getTime());
-            viewHolder.getLevelView().setText(Float.toString(historicalData.get(position).getDistance()));
+            viewHolder.getLevelView().setText("Water level: "+Float.toString(historicalData.get(position).getDistance()));
         }
     }
 

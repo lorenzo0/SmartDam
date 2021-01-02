@@ -1,18 +1,20 @@
-#define SONAR_TRIG 4  //D4
-#define SONAR_ECHO 5  //D3
-#define LED_UNO 16  //D0
+#define SONAR_TRIG 2  //D2
+#define SONAR_ECHO 4  //D1
+#define LED_UNO 5  //D0
 
 #include "Sonar.h"
 #include "MsgServiceHTTP.h"
 #include "Globals.h"
 #include "Led.h"
 
+/* supponendo di eseguire il test  in un ambiente a 20 °C */
+const float vs = 331.45 + 0.62*20;
+
 Sonar* sonar;
 Led* led;
 long currentTs, ts0;
 String state;
-double currentDistance;
-float stateTemp;
+float currentDistance;
 
 void setup() {
   Serial.begin(9600);
@@ -25,19 +27,15 @@ void setup() {
 
   MsgService.init();
   led -> switchOff();
-
+  
   /* Fase di testing */
-  float value = 2.233333333;
-  state = "ALLARM";
-  MsgService.sendMsg(value, state);
+  checkState();
 }
 
 void loop() {
-  //ts0 = millis();
-  //checkState();
-  //executeState();  
+  ts0 = millis();
+  executeState();
 }
-
 
 /* 
  *  Se il livello dell'acqua è <L1 allora lo stato continua ad essere normale.
@@ -48,56 +46,42 @@ void loop() {
 */
 
 void checkState(){
-  //sonar restituisce 0, toCheck!
-  currentDistance = sonar -> getDistance();
+  currentDistance = sonar->getDistance();
   if(currentDistance > min_level){
     state = "PRE-ALLARM";
     if(currentDistance > max_level)
       state = "ALLARM";
   }else if(currentDistance < min_level)
     state = "NORMAL";
-  
-  
-  //MsgService.sendMsg(stateTemp);
-  //executeState();
 }
 
 
 /* WDT riavvia l'applicazione anche in questo caso, uso dunque delay
    per ottenere una soluzione simile a quella iniziale*/
-   
-/*
- * while(currentTs - ts0 < min_freq){
- *    currentTs = millis();
- * }
-*/
+ 
 void executeState(){
 
   currentTs = millis();
   
   if(state == "PRE-ALLARM"){
+    MsgService.sendMsg(currentDistance, state);
+      while(min_freq - (currentTs-ts0)>=0){
+        led -> blinking();
+        currentTs = millis();
+      }
+  }else if(state == "ALLARM"){
       led -> switchOn();
       currentTs = millis();
-      delay(min_freq - (currentTs-ts0));
-      /*sonar restituisce 0, toCheck!*/
-      //MsgService.sendMsg(sonar -> getDistance());
-      /*Serial.println("Ts0: "+ String(ts0) + " - CurrentTs: " + String(currentTs));
-      Serial.println("Difference: "+ String(currentTs - ts0) + " - min_freq: "+ String(min_freq));*/
-      ts0 = millis();
-  }else if(state == "ALLARM"){
-      led -> blinking();
-      currentTs = millis();
+      MsgService.sendMsg(currentDistance, state);
       delay(max_freq - (currentTs-ts0));
-      /*sonar restituisce 0, toCheck!*/
-      //MsgService.sendMsg(sonar -> getDistance());
-      ts0 = millis();
+      
   }else if(state == "NORMAL")
       led -> switchOff();
+  
+  checkState();
+  ts0 = millis();
 }
 
-void calculateOpeningDam(){
-  
-}
 
 
       

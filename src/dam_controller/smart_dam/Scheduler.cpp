@@ -3,10 +3,11 @@
 int newOpeningDAM = -1;
 MsgServiceBT msgServiceBLUETOOTH(2,3);
 
-void Scheduler::init(){
+void Scheduler::init(Led* led_pin){
   nTasks = 0;
   indexCurrentTaskActive = 0;
   msgServiceBLUETOOTH.init(); 
+  led = new Led(led_pin);
 }
 
 bool Scheduler::addTask(Task* task){
@@ -37,11 +38,9 @@ bool Scheduler::addTask(Task* task){
  *  
  *  La variabile 'i' è stata introdotta per rendere il codice più leggibile, sostituendo 'indexCurrentTaskActive'
 */
-void Scheduler::schedule(){  
-  if(indexCurrentTaskActive == 2)
-    bluethoot_receiving();  
-  if(indexCurrentTaskActive == 1)    
-    checkMessageReceivedSERIAL();
+void Scheduler::schedule(){
+  checkMessageReceivedSERIAL();  
+  bluethoot_receiving();   
   taskList[indexCurrentTaskActive] -> tick();
 }
 
@@ -58,30 +57,33 @@ void Scheduler::schedule(){
 
 void Scheduler::bluethoot_receiving(){
    if (msgServiceBLUETOOTH.isMsgAvailable()) {
-    MsgBT* MsgReceivedBT = msgServiceBLUETOOTH.receiveMsg();
-    String messageReceived = MsgReceivedBT->getContent();
-    Serial.println("Message received: "+messageReceived);
+    String messageReceived = msgServiceBLUETOOTH.receiveMsg();
 
-    if(messageReceived == "NORMAL" || 
-        messageReceived == "PRE-ALLARM")
-          setIndexCurrentTaskActive(0);
-      else if(messageReceived == "ALLARM")
-          setIndexCurrentTaskActive(1);
-      else if(messageReceived == "MOD-OP")
-          setIndexCurrentTaskActive(2);
+    if(messageReceived == "ALLARM")
+        setIndexCurrentTaskActive(1);
+    else if(messageReceived == "MOD-OP")
+        setIndexCurrentTaskActive(2);
     else  
       setNewOpeningDAM(messageReceived.toDouble());
-    
-       
-    delete MsgReceivedBT;
-    messageReceived = "";
   }
 }
 
 void Scheduler::checkMessageReceivedSERIAL(){
-  if(MsgServiceSERIAL.isMsgAvailable()){
-    String msgReceiveSERIAL = MsgServiceSERIAL.receiveMsg();
-    setNewOpeningDAM(msgReceiveSERIAL.toDouble());
+  if(Serial.available() > 0){
+    String msgReceiveSERIALState, msgReceiveSERIALOpening;
+    while (Serial.available() > 0) {
+      msgReceiveSERIALState = Serial.readStringUntil('|'); 
+      Serial.read(); 
+      msgReceiveSERIALOpening = Serial.readStringUntil('\n');
+      Serial.read(); 
+    }
+
+    if(msgReceiveSERIALState == "PRE-ALLARM")
+        setIndexCurrentTaskActive(0);
+    else if(msgReceiveSERIALState == "ALLARM"){
+        setIndexCurrentTaskActive(1);
+        setNewOpeningDAM(msgReceiveSERIALOpening.toInt());
+    }
   }
 }
 

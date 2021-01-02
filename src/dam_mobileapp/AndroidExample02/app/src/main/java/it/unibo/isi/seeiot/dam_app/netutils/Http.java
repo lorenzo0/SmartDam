@@ -14,6 +14,8 @@ import java.util.Date;
 
 public class Http {
 
+    HTTPRequests httpRequests = new HTTPRequests();
+
     public interface Listener{
         void onHttpResponseAvailable(final HttpResponse response);
     }
@@ -25,6 +27,8 @@ public class Http {
                 final HttpURLConnection connection;
                 try {
                     connection = (HttpURLConnection) new URL(url).openConnection();
+                    connection.setReadTimeout(10000);
+                    connection.setConnectTimeout(15000);
                     connection.setRequestMethod("GET");
 
                     return new HttpResponse(connection.getResponseCode(), connection.getInputStream());
@@ -48,6 +52,8 @@ public class Http {
                 final HttpURLConnection connection;
                 try {
                     connection = (HttpURLConnection) new URL(url).openConnection();
+                    connection.setReadTimeout(10000);
+                    connection.setConnectTimeout(15000);
                     connection.setRequestMethod("POST");
                     connection.setDoOutput(true);
                     connection.getOutputStream().write(payload);
@@ -81,7 +87,6 @@ public class Http {
 
                 if (code == 200)
                     return new HttpResponse(connection.getResponseCode(), connection.getInputStream());
-
 
             } catch (MalformedURLException e) {
                 e.printStackTrace();

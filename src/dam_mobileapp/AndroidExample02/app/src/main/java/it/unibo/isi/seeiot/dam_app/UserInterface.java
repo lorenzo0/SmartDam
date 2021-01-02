@@ -7,15 +7,19 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Switch;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import cit.unibo.isi.seeiot.dam_app.R;
 import it.unibo.isi.seeiot.dam_app.bluetooth.Bluetooth;
@@ -33,7 +37,6 @@ public class UserInterface extends AppCompatActivity {
     Switch modalitySwitch;
     boolean checkOnCreate;
     Bluetooth bluetoothConn;
-    CountDownTimer countDown;
     handlerAlert alerHandler;
     HTTPRequests httpRequests;
     View currentView;
@@ -49,29 +52,41 @@ public class UserInterface extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         if (extras != null)
             httpRequests = (HTTPRequests) getIntent().getSerializableExtra("httpReq");
+        else
+            httpRequests = new HTTPRequests();
 
+        Log.d("TAG-XX", Integer.toString(httpRequests.getDataReceiveds().size()));
+
+        if(getIntent().getSerializableExtra("bluetooth") != null)
+            bluetoothConn = (Bluetooth) getIntent().getSerializableExtra("bluetooth");
+        else {
+            bluetoothConn = new Bluetooth();
+            requestOpeningBT();
+            //connectBT();
+        }
+
+        CountDown countDown = new CountDown(currentView, bluetoothConn);
+        countDown.execute();
 
         modalitySwitch = (Switch) findViewById(R.id.switch1);
         currentView = findViewById(R.id.angle).getRootView();
         checkOnCreate = true;
 
-        final BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (btAdapter != null && !btAdapter.isEnabled()) {
-            startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), global.bluetooth.ENABLE_BT_REQUEST);
-        }
-
+        requestOpeningBT();
         initUI();
-        connectBT();
-        //da gestire se array è vuoto, rifaccio la richiesta
-        if(httpRequests.getDataReceiveds().size() != 0)
+
+        if (httpRequests.getDataReceiveds().size() != 0)
             httpRequests.modifyItemsOnUI(currentView, bluetoothConn);
+        else
+            httpRequests.tryHttpGetHData(bluetoothConn);
+
     }
 
     /*
     *  Handling Life-Cicly Activity
     */
 
-    @Override
+/*    @Override
     protected void onStart() {
         super.onStart();
     }
@@ -80,11 +95,12 @@ public class UserInterface extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if(!(checkOnCreate))
-            httpRequests.tryHttpGetHData(currentView, bluetoothConn);
-
+            httpRequests.tryHttpGetHData(bluetoothConn);
+        //createCountDown(5000);
+        //CountDownTimer();
         checkOnCreate = false;
-        createCountDown(5000);
     }
+ */
 
     @Override
     protected void onPause() {
@@ -99,6 +115,14 @@ public class UserInterface extends AppCompatActivity {
     * quindi se non riesce a mantenere la connessione, allora ri-chiedo la connessione
     * all'embedded system.
     */
+
+    protected void requestOpeningBT(){
+        final BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (btAdapter != null && !btAdapter.isEnabled()) {
+            startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), global.bluetooth.ENABLE_BT_REQUEST);
+        }
+    }
+
     protected void connectBT(){
         try {
             if(bluetoothConn.btChannel==null)
@@ -113,9 +137,13 @@ public class UserInterface extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked) {
                     if (global.currentState.equals("ALLARM")) {
-                        bluetoothConn.sendMessage("MOD-OP");
-                        global.mod_op = true;
-                        alerHandler.showAlert(UserInterface.this, currentView, httpRequests, bluetoothConn);
+                        if(bluetoothConn.btChannel != null) {
+                            bluetoothConn.sendMessage("MOD-OP");
+                            global.mod_op = true;
+                            alerHandler.showAlert(UserInterface.this, currentView, httpRequests, bluetoothConn);
+                        }else
+                            alerHandler.showNoBTAlert(UserInterface.this);
+
                     }else{
                         alerHandler.showWarningAlert(UserInterface.this);
                         modalitySwitch.setChecked(false);
@@ -132,37 +160,53 @@ public class UserInterface extends AppCompatActivity {
             intent.putExtras(bundle);
             startActivity(intent);
         });
-
     }
 
+    /*public void CountDownTimer() {
+        final Handler handler = new Handler();
+        Timer timer = new Timer();
+        TimerTask AsynTaskData = new TimerTask() {
+            @Override
+            public void run() {
+                handler.post(new Runnable() {
+                    public void run() {
+                        try {
+                            CountDown countDown = new CountDown(currentView, bluetoothConn);
+                            Toast.makeText(getApplicationContext(),"Finito!", Toast.LENGTH_SHORT).show();
+                            countDown.execute();
+                        } catch (Exception e) {
+                        }
+                    }
+                });
+            }
+        };
+        timer.schedule(AsynTaskData, 0, 5000);
+    }*/
+/*
+    public void createCountDown(long numberMilliSec) {
+        countDownTimer = new CountDownTimer(numberMilliSec, 1000) {
 
-
-    /* CountDown handle */
-
-    public void createCountDown(long numberMilliSec){
-        countDown = new CountDownTimer(numberMilliSec, 1000) {
-
-            public void onTick(long millisUntilFinished) {}
+            public void onTick(long millisUntilFinished) {
+                Log.d("CURRENT-TIME", Long.toString(millisUntilFinished));
+                if(millisUntilFinished<1500)
+                    countDown = new CountDown(httpRequests, currentView, bluetoothConn);
+                    countDown.execute();
+            }
 
             public void onFinish() {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        //Toast.makeText(getApplicationContext(),"Finito!",Toast.LENGTH_SHORT).show();
-                        if(!(global.mod_op))
-                            httpRequests.tryHttpGetHData(currentView, bluetoothConn);
 
-                        if(bluetoothConn.btChannel != null)
-                            Log.d("THREAD-TXT", bluetoothConn.btChannel.toString());
-                        else
-                            Log.d("THREAD-TXT", "false");
+                        //if(!(global.mod_op))
+                        //httpRequests.tryHttpGetHData(currentView, bluetoothConn);
+
+                        Toast.makeText(getApplicationContext(),"Finito!", Toast.LENGTH_SHORT).show();
                         createCountDown(numberMilliSec);
                     }
                 });
             }
         };
-
-        countDown.start();
-    }
-
+        countDownTimer.start();
+    }*/
 }

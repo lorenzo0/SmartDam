@@ -75,7 +75,7 @@ void setup(){
   delay(200);
 
   
-  scheduler.init();
+  scheduler.init(LED_UNO);
   MsgServiceSERIAL.init();
 
   Task* normalPreState = new NormalPreState(LED_UNO);

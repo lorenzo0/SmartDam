@@ -31,33 +31,3 @@ void MsgServiceClass::init(){
 void MsgServiceClass::sendMsg(const String& msg){
   Serial.println(msg);  
 }
-
-void serialEvent() {
-  /* reading the content */
-  while (Serial.available()) {
-    char ch = (char) Serial.read();
-    if (ch == '\n'){
-      MsgServiceSERIAL.currentMsg = new Msg(content);
-      MsgServiceSERIAL.msgAvailable = true;      
-    } else {
-      content += ch;      
-    }
-  }
-}
-
-bool MsgServiceClass::isMsgAvailable(Pattern& pattern){
-  return (msgAvailable && pattern.match(*currentMsg));
-}
-
-Msg* MsgServiceClass::receiveMsg(Pattern& pattern){
-  if (msgAvailable && pattern.match(*currentMsg)){
-    Msg* msg = currentMsg;
-    msgAvailable = false;
-    currentMsg = NULL;
-    content = "";
-    return msg;  
-  } else {
-    return NULL; 
-  }
-  
-}

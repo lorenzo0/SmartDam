@@ -23,7 +23,7 @@ class MsgServiceBT {
     MsgServiceBT(int rxPin, int txPin);  
     void init();  
     bool isMsgAvailable();
-    MsgBT* receiveMsg();
+    String receiveMsg();
     bool sendMsg(MsgBT msg);
   
   private:

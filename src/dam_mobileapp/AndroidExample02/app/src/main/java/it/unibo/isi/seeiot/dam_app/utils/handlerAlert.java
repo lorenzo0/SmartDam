@@ -93,6 +93,21 @@ public class handlerAlert {
         dialog.show();
     }
 
+    public void showNoBTAlert(Context context) {
+        final AlertDialog dialog = new AlertDialog.Builder(context)
+                .setTitle("Errore")
+                .setMessage("E' possibile entrare in modalità modifica solo se il dispositivo è connesso al HC-06 tramite bluetooth")
+                .setCancelable(false)
+                .setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                    }
+                })
+                .create();
+
+        dialog.show();
+    }
+
     /*
      *   E' possibile per l'operatore inserire alcuni valori percentili per
      *   l'apertura della diga. (dati dalle specifiche)

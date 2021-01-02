@@ -119,7 +119,7 @@ public class HTTPRequests implements Serializable {
         }
     }
 
-    public void tryHttpGetHData(View oldView, Bluetooth bluetooth){
+    public void tryHttpGetHData(Bluetooth bluetooth){
 
         dataReceiveds = new ArrayList<DataReceived>();
 

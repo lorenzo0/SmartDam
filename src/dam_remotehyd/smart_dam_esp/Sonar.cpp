@@ -21,7 +21,10 @@ float Sonar::getDistance(){
   digitalWrite(pinSonarTrig,LOW);
   
   long tUS = pulseIn(pinSonarEcho, HIGH);
-  
-  double t = tUS*0.034/2;
-  return t;
+  float t = tUS / 1000.0 / 1000.0 / 2;
+  float distance = t*vs;
+
+  /* Testing * 10*/
+  distance *= 10;
+  return distance;
 }

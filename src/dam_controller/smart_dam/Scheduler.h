@@ -4,6 +4,7 @@
 #include "Task.h"
 #include "MsgServiceBT.h"
 #include "MsgServiceSERIAL.h"
+#include "Led.h"
 
 #define MAX_TASKS 50
 
@@ -14,9 +15,10 @@ class Scheduler {
   String nameTask;
   Task* taskList[MAX_TASKS];  
   Task* taskObject;
+  Led* led;
 
 public:
-  void init();  
+  void init(Led* led_pin);  
   virtual bool addTask(Task* task);  
   virtual void schedule();
   void setIndexCurrentTaskActive(int index);
