@@ -34,7 +34,8 @@ public class HTTPRequest implements Serializable {
 
     private RequestQueue mRequestQueue;
     private StringRequest mStringRequest;
-    String url = "https://30354619d486.ngrok.io/api/data";
+    String url = "https://fb3076ed2485.ngrok.io/api/data";
+    String urlLog = "https://fb3076ed2485.ngrok.io/api/log";
     ArrayList<DataReceived> storageData = new ArrayList<DataReceived>();
     DataReceived sampleData;
     ModifyUI modifyItemsOnUI;
@@ -50,6 +51,7 @@ public class HTTPRequest implements Serializable {
         mStringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
+                    trySendLog(context, "ESP requested succesfully data by GET method.");
                     fillInArray(response, oldView, bluetoothConn, httpRequest);
             }
         }, new Response.ErrorListener() {
@@ -61,6 +63,33 @@ public class HTTPRequest implements Serializable {
         });
 
         mRequestQueue.add(mStringRequest);
+    }
+
+    public void trySendLog(Context context, String message) {
+
+        RequestQueue requestQueue = Volley.newRequestQueue(context);
+
+        JSONObject postData = new JSONObject();
+        try {
+            postData.put("sender", "APP");
+            postData.put("message", message);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, urlLog, postData, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        });
+
+        requestQueue.add(jsonObjectRequest);
     }
 
     public void tryHTTPost(String percentageOpening, Bluetooth bluetooth, Context context){
@@ -81,7 +110,7 @@ public class HTTPRequest implements Serializable {
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, postData, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                System.out.println(response);
+                trySendLog(context, "ESP added succesfully data by POST method.");
             }
         }, new Response.ErrorListener() {
             @Override
@@ -160,7 +189,6 @@ public class HTTPRequest implements Serializable {
                         array.getJSONObject(i).getInt("open-angle"));
 
                 storageData.add(sampleData);
-                Log.d("PROVA-HTTP", storageData.get(i).getTime());
             }
 
             modifyItemsOnUI.modifyItemsOnUI(oldView, bluetoothConn, httpRequest);

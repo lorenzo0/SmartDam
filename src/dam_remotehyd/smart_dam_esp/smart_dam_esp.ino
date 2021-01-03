@@ -73,6 +73,7 @@ void executeState(){
       led -> switchOn();
       currentTs = millis();
       MsgService.sendMsg(currentDistance, state);
+      MsgService.sendLogMsg("Invio dato " + String(currentDistance) + " nello stato di " + state);
       delay(max_freq - (currentTs-ts0));
       
   }else if(state == "NORMAL")

@@ -18,13 +18,14 @@ public:
   void init();
   void sendMsg(const float& value, const String& state);
   void checkConnection();
+  void sendLogMsg(const String& message);
 
 private:
 
-char* nameWIFI = "Wind3 HUB-7C4FA6";
-char* pwdWIFI = "CasaPisano!!";
-char* addressWIFI = "http://30354619d486.ngrok.io";
-String sender = "ESP";
+  char* nameWIFI = "Wind3 HUB-7C4FA6";
+  char* pwdWIFI = "CasaPisano!!";
+  char* addressWIFI = "http://fb3076ed2485.ngrok.io";
+  String sender = "ESP";
 
 };
 

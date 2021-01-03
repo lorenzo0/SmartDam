@@ -3,7 +3,6 @@
 
 #include "Task.h"
 #include "MsgServiceBT.h"
-#include "MsgServiceSERIAL.h"
 #include "Led.h"
 
 #define MAX_TASKS 50

@@ -27,7 +27,6 @@ rdx di arduino comunica con tdx di hc-06*/
 #include "Scheduler.h"
 #include "servo_motor_impl.h"
 #include "Globals.h"
-#include "MsgServiceSERIAL.h"
 #include "NormalPreState.h"
 #include "AllarmState.h"
 #include "ModifyState.h"
@@ -54,12 +53,10 @@ void setup(){
   Serial.begin(9600);
 
   while (!Serial){}
-  Serial.println("ready to go."); 
   Led* led_uno = new Led(LED_UNO);
   
   pMotor = new ServoMotorImpl(9);
-  
-  MsgServiceSERIAL.sendMsg("CALIBRATION");
+
   pMotor->on();  
     for (int i = 0; i < 180; i++) {
       pMotor->setPosition(i);         
@@ -70,13 +67,10 @@ void setup(){
       delay(15);
     }
    pMotor->off();
-  
-  Serial.println("SENSORS READY.");
   delay(200);
 
   
   scheduler.init(LED_UNO);
-  MsgServiceSERIAL.init();
 
   Task* normalPreState = new NormalPreState(LED_UNO);
   Task* allarmState = new AllarmState(LED_UNO, SERVO_MOTOR);
