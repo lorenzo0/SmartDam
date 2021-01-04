@@ -3,6 +3,7 @@
 
 MsgServiceHTTP MsgService;
 
+/* Si istanzia una connessione tramite il nome di quest'ultima e la sua password */
 void MsgServiceHTTP::init(){
   WiFi.begin(nameWIFI, pwdWIFI);
   Serial.print("Connecting to WIFI" + String(nameWIFI));
@@ -14,6 +15,17 @@ void MsgServiceHTTP::init(){
   delay(100);
   Serial.println("Connected to WIFI: "+ String(nameWIFI));
 }
+
+
+/* 
+ *  Procedura necessaria per inviare un messaggio tramite la connessione prima istaurata.
+ *  Il sistema prevede un'API per invio dati ed una per invio e memorizzazione del log.
+ *  Viene dunque preparato il messaggio in formato JSON mantenendo il pattern richiesto;
+ *  
+ *    { "campo": "valoreStringa", "campo": valoreNumerico }
+ *    
+ *  Se il return code è pari a 200, allora l'invio è stato effettuato correttamente.
+*/
 
 void MsgServiceHTTP::sendMsg(const float& value, const String& state){
   if (WiFi.status()== WL_CONNECTED){
@@ -57,6 +69,7 @@ void MsgServiceHTTP::sendLogMsg(const String& message){
   }
 }
 
+/* Metodo usato in fase di testing e debugging, utile per compredere se esiste ancora la connessione */
 void MsgServiceHTTP::checkConnection(){
   if (WiFi.status()== WL_CONNECTED)
     Serial.println("true");

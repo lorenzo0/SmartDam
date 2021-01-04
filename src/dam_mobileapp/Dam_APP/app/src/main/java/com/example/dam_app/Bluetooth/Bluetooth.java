@@ -17,20 +17,24 @@ import unibo.btlib.ConnectToBluetoothServerTask;
 import unibo.btlib.ConnectionTask;
 import unibo.btlib.exceptions.BluetoothDeviceNotFound;
 
+/*
+*   La classe Bluetooth sfrutta le librerie presenti in Java/com/bt-lib.
+*   Grazie a queste, è possibile istanziare un nuovo oggetto di tipo BluetoothChannel
+*   e sfruttare tutte le sue potenzialità.
+*
+*   Decido di non invocare il generatore (randomico oppure a partire da una stringa) di UUID
+*   dato che utilizzo il default UUID per gli embeddedDevice. Questo mi è possibile perchè i due device
+*   che devono comunicare NON possono esplicitare e quindi condividere lo stesso UUID.
+*   L'UUID utilizzato è presentato come convenzione ad-hoc per embedded system.
+*/
+
 public class Bluetooth extends AppCompatActivity implements Serializable {
 
     public BluetoothChannel btChannel;
-
     public Bluetooth(){}
 
     public void connectToBTServer(Context context) throws BluetoothDeviceNotFound {
         final BluetoothDevice serverDevice = BluetoothUtils.getPairedDeviceByName(Global.bluetooth.BT_DEVICE_ACTING_AS_SERVER_NAME);
-        /*
-         *  decido di non utilizzare il generatore (randomica oppure a partire da una stringa) di UUID
-         *  dato che utilizzo il default UUID per gli embeddedDevice. Questo mi è possibile perchè i due device
-         *  che devono comunicare NON possono esplicitare e quindi condividere lo stesso UUID.
-         *  L'UUID utilizzato è presentato come convenzione ad-hoc per embedded system
-         */
         final UUID uuid = BluetoothUtils.getEmbeddedDeviceDefaultUuid();
 
         new ConnectToBluetoothServerTask(serverDevice, uuid, new ConnectionTask.EventListener() {
@@ -50,8 +54,6 @@ public class Bluetooth extends AppCompatActivity implements Serializable {
     public void closeConnection(){
         btChannel.close();
     }
-
-
     public void sendMessage(String message){
         btChannel.sendMessage(message);
     }

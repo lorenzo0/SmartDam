@@ -1,14 +1,38 @@
-#define SONAR_TRIG 2  //D2
-#define SONAR_ECHO 4  //D1
-#define LED_UNO 5  //D0
+#define SONAR_TRIG 2  
+#define SONAR_ECHO 4  
+#define LED_UNO 16  
 
 #include "Sonar.h"
 #include "MsgServiceHTTP.h"
 #include "Globals.h"
 #include "Led.h"
 
-/* supponendo di eseguire il test  in un ambiente a 20 °C */
-const float vs = 331.45 + 0.62*20;
+/* 
+ *  Il microprocessore ESP8266 è un componenete essenziale per questo sistema.
+ *  Il suo ruolo è quello di richiedere al sensore sonar la distanza dell'oggetto (se esiste)
+ *  di fronte a lui. Vista l'assenza del sensore di temperatura dal sistema, viene
+ *  supposto di eseguire il test in un ambiente esterno con temperatura pari a 20 °C.
+ *  
+ *  Una volta definito il sonar ed il led tramite i pin rispettivi;
+ *    GPIO 2 <--> D2
+ *    GPIO 4 <--> D1
+ *    GPIO 16 <--> D0
+ *    
+ *  viene richiesta la distanza (calcolata in cm/s visto l'ambiente dove si svolge
+ *  l'esperimento con un campo ridotto) e gestito, in base ai valori globari (fittizi) presenti
+ *  in specifiche, lo stato corrente del sistema.
+ *  
+ *  Una volta trovata la distanza dell'oggetto ed ottenuto lo stato corrente del sistema, viene
+ *  inviato un messaggio, tramite HTTP al server. Per ottimizzare l'efficienza del sistema, non viene
+ *  istanziato un puntatore ad un oggetto di tipo MsgServiceHTTP ma viene creata una variabile esterna
+ *  pronta ad invocare i metodi necessari, MsgService.
+ *  
+ *  *** PER MODIFICHE ***
+ *  Le costanti è possibile variarle all'interno del file Globals.h (anche la temperatura esterna al sistema,
+ *  in caso di aggiunta del sensore di temperatura (TMP36 o altri).
+ *  E' possibile modificare il link per la connessione HTTP nella classe MsgServiceHTTP.h
+ *  
+*/
 
 Sonar* sonar;
 Led* led;
@@ -28,21 +52,21 @@ void setup() {
   MsgService.init();
   led -> switchOff();
   
-  /* Fase di testing */
   checkState();
 }
 
 void loop() {
   ts0 = millis();
+  currentDistance = sonar->getDistance();
   executeState();
 }
 
 /* 
- *  Se il livello dell'acqua è <L1 allora lo stato continua ad essere normale.
- *  Se il livello invece è >L1 allora lo stato cambierà alla conclusione del tick. 
- *  Viene dunque settata la task a completed.
- *  Se il livello è >L1 && >=L2 lo stato passa da uno stato di normalità ad uno stato di allarme.
- *  
+ *  Se il livello dell'acqua è <L1 allora lo stato continua ad essere NORMAL.
+ *  Se il livello invece è >L1 allora lo stato cambierà in PRE-ALLARM.
+ *  Se il livello è >L1 && >=L2 lo stato passa ad uno stato di ALLARM.
+ *  E' possibile variare gli stati in modo non vincolante, non è necessario quindi
+ *  passare da uno stato di PRE-ALLARM per trovarsi in uno stato di ALLARM.
 */
 
 void checkState(){
@@ -56,8 +80,17 @@ void checkState(){
 }
 
 
-/* WDT riavvia l'applicazione anche in questo caso, uso dunque delay
-   per ottenere una soluzione simile a quella iniziale*/
+
+/*
+ * ESP necessita il controllo del suo flusso di controllo nel file.ino,
+ * non è possibile quindi l'approccio a stati finiti richiamando uno scheduler.
+ * Affermo questo perchè il Watch-Dog-Timer, dopo (circa) 3 secondi,
+ * verifica che l'utilizzo di CPU è riservata ad uno scheduler che non prevede
+ * un'approccio di tipo yielding per tutti i task, compresi quelli con bassa priorità.
+ * Ad esempio, uno scheduler che attende la conclusione di un tick di un qualsiasi task,
+ * viene visto dal WDT come un effettivo blocco del sistema e questo comporta un riavvio immediato.
+ * ("Task WatchDog got triggered")
+*/
  
 void executeState(){
 
@@ -78,8 +111,8 @@ void executeState(){
       
   }else if(state == "NORMAL")
       led -> switchOff();
-  
-  checkState();
+
+  checkState();  
   ts0 = millis();
 }
 

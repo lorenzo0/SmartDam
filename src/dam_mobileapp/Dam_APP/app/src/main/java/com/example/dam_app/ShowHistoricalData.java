@@ -34,7 +34,6 @@ public class ShowHistoricalData extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             dataReceiveds = (ArrayList<DataReceived>) getIntent().getSerializableExtra("httpReq");
-            //bluetoothConn = (Bluetooth) getIntent().getSerializableExtra("bluetooth");
         }
 
         recyclerView.setAdapter(new StorageDataAdapter(dataReceiveds));
@@ -51,9 +50,6 @@ public class ShowHistoricalData extends AppCompatActivity {
     @Override
     public Intent getParentActivityIntent() {
         Intent intent = super.getParentActivityIntent();
-        /*Bundle bundle = new Bundle();
-        bundle.putSerializable("bluetooth", bluetoothConn);
-        intent.putExtras(bundle);*/
         return intent;
     }
 }

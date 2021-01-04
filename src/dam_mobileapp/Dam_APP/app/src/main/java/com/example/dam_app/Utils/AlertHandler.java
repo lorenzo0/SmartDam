@@ -27,6 +27,13 @@ public class AlertHandler {
         spinnerArray = fillChoice(spinnerArray);
     }
 
+    /*
+    * Alert nel caso in cui il sistema si trovi in uno stato di ALLARM e sia presente una connessione bluetooth
+    *
+    * Lo spinner viene riempito nel costruttore della classe AlertHandler e viene contestualizzato nell'alert
+    * grazie ad un adapter che colloca l'oggetto a seguito di un layoutInflater nel layout ricercato.
+    *
+    */
     public void showAlert(Context context, View oldView, HTTPRequest httpRequests, Bluetooth bluetoothConn) {
 
         LayoutInflater inflater = (LayoutInflater) context.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
@@ -71,6 +78,7 @@ public class AlertHandler {
         b.create().show();
     }
 
+    /* Alert nel caso in cui il sistema NON si trovi in uno stato di ALLARM (è indifferente che sia o no presente una connessione bluetooth) */
     public void showWarningAlert(Context context) {
         final AlertDialog dialog = new AlertDialog.Builder(context)
                 .setTitle("Errore")
@@ -86,6 +94,7 @@ public class AlertHandler {
         dialog.show();
     }
 
+    /* Alert nel caso in cui NON è istauranta una connesione bluetooth (è indifferente che il corrente stato del sistema è ALLARM) */
     public void showNoBTAlert(Context context) {
         final AlertDialog dialog = new AlertDialog.Builder(context)
                 .setTitle("Errore")

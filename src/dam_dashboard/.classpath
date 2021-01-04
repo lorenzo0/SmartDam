@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry excluding="lib/jfreechart-1.0.19/tests/|lib/jfreechart-1.0.19/source/|lib/jfreechart-1.0.19/swt/|lib/jfreechart-1.0.19/experimental/" kind="src" path=""/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/loren/Downloads/java-json.jar/java-json.jar"/>
+	<classpathentry kind="lib" path="D:/Lorenzo/Universita/Sistemi_Embedded/Castelli_Pisano_SEIOT_Secondo_Progetto/src/java/lib/jfreechart-1.0.19/jfreechart-1.0.19-demo.jar"/>
+	<classpathentry kind="lib" path="D:/Lorenzo/Universita/Sistemi_Embedded/Castelli_Pisano_SEIOT_Secondo_Progetto/src/java/lib/jssc.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

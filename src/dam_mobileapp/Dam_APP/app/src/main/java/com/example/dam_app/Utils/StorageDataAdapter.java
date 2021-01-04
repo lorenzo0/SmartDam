@@ -1,6 +1,5 @@
 package com.example.dam_app.Utils;
 
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,15 +13,25 @@ import com.example.dam_app.R;
 
 import java.util.ArrayList;
 
+/*
+* La recycleView ci permette di visualizzare, in modo dinamico, tutti gli elementi presenti
+* nell'arrayList in HTTPRequest. La recycleView crea, attraverso il suo adapter n elementi del layout
+* predisposto per il singolo oggetto, dove n è il numero di istanze di DataReceived contenute
+* nell'arrayList.
+*
+* Il ViewHolder ci permette di creare un'inflater nel layout 'fragment_data_history' ed avere
+* un'istanza di TextView per ogni dato avente.
+*
+* Il suo adapted dunque, attraverso il onBindViewHolder, invoca il layout manager che si occupa di creare
+* una 'card' (come in fragment_data_history) per ogni istanza e ne setta i valori nei suoi campi di tipo TextView.
+*
+*/
+
 public class StorageDataAdapter extends RecyclerView.Adapter<StorageDataAdapter.ViewHolder> {
 
     private ArrayList<DataReceived> historicalData;
 
-    /**
-     * Provide a reference to the type of views that you are using
-     * (custom ViewHolder).
-     */
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder {
         private TextView date;
         private TextView state;
         private TextView angle;
@@ -52,17 +61,10 @@ public class StorageDataAdapter extends RecyclerView.Adapter<StorageDataAdapter.
         public TextView getLevelView() {
             return level;
         }
-
-        @Override
-        public void onClick(View view) {}
     }
 
     public StorageDataAdapter(ArrayList<DataReceived> historicalData) {
         this.historicalData = historicalData;
-    }
-
-    public ArrayList<DataReceived> getList(){
-        return  this.historicalData;
     }
 
     @Override
@@ -70,28 +72,21 @@ public class StorageDataAdapter extends RecyclerView.Adapter<StorageDataAdapter.
         return historicalData.size();
     }
 
-    // Create new views (invoked by the layout manager)
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-        // Create a new view, which defines the UI of the list item
         LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
         View v = inflater.inflate(R.layout.fragment_data_history, viewGroup, false);
 
         return new StorageDataAdapter.ViewHolder(v);
     }
 
-    // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
-
-        // Get element from your dataset at this position and replace the
-        // contents of the view with that element
         if(historicalData.size() >= position) {
             viewHolder.getAngleTextView().setText("Opening Dam: "+historicalData.get(position).getAngle());
             viewHolder.getStateTextView().setText(historicalData.get(position).getState());
             viewHolder.getDateTextView().setText(historicalData.get(position).getTime());
             viewHolder.getLevelView().setText("Water level: "+ Float.toString(historicalData.get(position).getDistance()));
-            Log.d("PROVA-VH", Float.toString(historicalData.get(position).getDistance()));
         }
     }
 

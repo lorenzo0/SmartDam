@@ -34,20 +34,38 @@ public class HTTPRequest implements Serializable {
 
     private RequestQueue mRequestQueue;
     private StringRequest mStringRequest;
-    String url = "https://fb3076ed2485.ngrok.io/api/data";
-    String urlLog = "https://fb3076ed2485.ngrok.io/api/log";
+    String url = "https://c5c6ce2e7eff.ngrok.io/api/data";
+    String urlLog = "https://c5c6ce2e7eff.ngrok.io/api/log";
     ArrayList<DataReceived> storageData = new ArrayList<DataReceived>();
     DataReceived sampleData;
     ModifyUI modifyItemsOnUI;
 
     public HTTPRequest(){modifyItemsOnUI = new ModifyUI();}
 
+    /*
+    * Per effettuare la richiesta HTTP in GET e POST, viene utilizzata la classe Volley messa
+    * a disposizione da Android. Questa, ha un funzionamento molto interessante. Tutte le richieste
+    * che partono da questa classe sono ASINCRONE, indipendenti quindi dal mainThread.
+    *
+    * La sua efficienza nel rilasciare le informazioni è data da una Queue creata per memorizzare le
+    * richieste che vengono fatte (Post e Get condividono la stessa RequestQueue).
+    * Quando viene aggiunta una nuova richiesta, è prima analizzata dal cache tread (worker thread),
+    * se questa è disponibile e può occuparsi della richiesta, la esegue subito.
+    * Se il cache thread non è disponibile momentaneamente oppure non è in grado di soddisfare la richiesta,
+    * allora quest'ultima viene aggiunta in una RequestQueue.
+    *
+    * Il primo network thread (worker thread) disponibile, prende in carico la richiesta e la manda in esecuzione.
+    * Come prima menzionato, tutti gli worker thread sono indipendenti dal main thread.
+    *
+    * Alla conclusione della richiesta (sia in esito positivo, sia in esito negativo), sia il cache thread,
+    * sia il network thread, consegna la risposta al main thread, che nel nostro caso, invocherà (con esito
+    * positivo, modifyUI).
+    *
+    */
+
     public void tryHTTPGet(Context context, View oldView, Bluetooth bluetoothConn, HTTPRequest httpRequest) {
 
-        //RequestQueue initialized
         mRequestQueue = Volley.newRequestQueue(context);
-
-        //String Request initialized
         mStringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -57,8 +75,7 @@ public class HTTPRequest implements Serializable {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-
-                Log.i("TAG","Error :" + error.toString());
+                Log.i("TAG-ErrorResponseVolley","Error :" + error.toString());
             }
         });
 
@@ -177,10 +194,6 @@ public class HTTPRequest implements Serializable {
             Global.currentState = array.getJSONObject(0).getString("state");
             Global.currentLevel = Float.valueOf(array.getJSONObject(0).getString("distance"));
 
-            /*
-             *   Non appena la connessione bluetooth si è istaurata, invio lo stato corrente al server.
-             */
-
             for(int i=0;i<array.length();i++)
             {
                 sampleData = new DataReceived(Float.valueOf(array.getJSONObject(i).getString("distance")),
@@ -205,10 +218,6 @@ public class HTTPRequest implements Serializable {
             Global.currentState = array.getJSONObject(0).getString("state");
             Global.currentLevel = Float.valueOf(array.getJSONObject(0).getString("distance"));
 
-            /*
-             *   Non appena la connessione bluetooth si è istaurata, invio lo stato corrente al server.
-             */
-
             for(int i=0;i<array.length();i++)
             {
                 sampleData = new DataReceived(Float.valueOf(array.getJSONObject(i).getString("distance")),
@@ -216,7 +225,6 @@ public class HTTPRequest implements Serializable {
                         array.getJSONObject(i).getString("time"),
                         array.getJSONObject(i).getInt("open-angle"));
 
-                Log.d("PROVA-HTTP", storageData.get(i).getTime());
                 storageData.add(sampleData);
             }
 

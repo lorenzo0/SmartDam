@@ -1,6 +1,20 @@
 #include "Arduino.h"
 #include "MsgServiceBT.h"
 
+/*
+ * Il canale bluetooth come inotrodotto nella classe smart_dam
+ * è necessario per comunicare con il sottosistema SMART_DAM.
+ * 
+ * Una volta modificato il suo nome, attraverso il comando AT 
+ * (comando che è utilizzato per cambiare dei parametri
+ * a livello hardware come il nome, il pin oppure verificare alcuni
+ * dati come la versione), il canale è pronto per essere utilizzato.
+ * 
+ * La luce rossa lampeggiante caratterizza lo stato di ricerca 
+ * (discovery) di nuovi dispositivi.
+ * La luce rossa fissa indica una connessione istaurata tra il 
+ * dispositivo embedded ed un dispositivo esterno (smarthphone, pc, etc..)
+*/
 
 MsgServiceBT::MsgServiceBT(int rxPin, int txPin){
   channel = new SoftwareSerial(rxPin, txPin);

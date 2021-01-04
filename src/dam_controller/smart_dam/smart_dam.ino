@@ -1,27 +1,29 @@
- /*
- * AVVISO PER MODIFICARE LE COSTANTI RICHIESTE IN SPECIFICA.
- * 
- * Per modificare la minima e massima frequenza (in Hz) è necessario accedere alla classe Potentiometer.h
- * Per modificare la massima durata delle varie task invece:
- *    - SLEEP_TIME in IdleTask.h
- *    - MAX_TIME in RunningTask.h
- *    - ERROR_TIME in ErrorTask.h
-*/
 
 /*
+ * Il microprocessore ARDUINO UNO è un componente previsto nel sistema
+ * smart_dam. Questo, ha il ruolo di gestire l'apertura e la chiusura della diga,
+ * simulata tramite servo motore. Inoltre, si occupa della comunicazione tramite 
+ * bluetooth con il sottosistema Dam_APP grazie al modulo HC-06. 
+ * Quest'ultimo,  permette di trasformare una porta UART\USART, più comunemente conosciuta come seriale, 
+ * in una porta Bluetooth, generalmente con profilo SPP(Serial Port Profile), diventando cosi una seriale tramite Bluetooth. 
+ * 
  *  BT module connection:  
- *  - RX is pin 2 => to be connected to TXD of BT module
- *  - TX is pin 3 => to be connected to RXD of BT module
+ *  - RX is pin 2 
+ *  - TX is pin 3 
  *
+ * E' prevista la comunicazioen incrociata tra HC-06 ed ARDUINO.
+ * Quindi, la tdx di HC-06 (pin 3) comunicherà con rdx di ARDUINO UNO, stesso principio
+ * viene applicato ad tdx di ARDUINO UNO, che comunicherà con  la rx di HC-06 (pin 2).
+ * 
+ * Viene inoltre utilizzata la libreria softwareSerial che permette di instaurare una comunicazione 
+ * di tipo seriale ASINCRONO con qualsiasi coppia di pin digitali (nel nostro caso 2,3).
+ * 
+ * La gestione del modulo bluetooth viene associata allo scheduler.
  */ 
 
 #define LED_UNO 10
 #define SERVO_MOTOR 9
 
-/* Grazie a softwareSerial è possibile instaurare una comunicazione di tipo seriale ASINCRONO
-con qualsiasi coppia di pin digitali
-
-rdx di arduino comunica con tdx di hc-06*/
 
 #define CALIBRATION_TIME_SEC 10
 #include "Scheduler.h"
@@ -33,10 +35,6 @@ rdx di arduino comunica con tdx di hc-06*/
 #include <SoftwareSerial.h>
 
 Scheduler scheduler;
-ServoMotor* pMotor;
-String bluethoot_message;
-
-Task* allarmState;
 
 /* 
  *  In setup viene prevista una calibratura dei sensori, in particolare
@@ -55,7 +53,7 @@ void setup(){
   while (!Serial){}
   Led* led_uno = new Led(LED_UNO);
   
-  pMotor = new ServoMotorImpl(9);
+  ServoMotor* pMotor = new ServoMotorImpl(9);
 
   pMotor->on();  
     for (int i = 0; i < 180; i++) {

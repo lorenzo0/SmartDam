@@ -10,5 +10,6 @@ const int min_freq = 10000;
 /*1 volta ogni 5 secondi*/
 const int max_freq = 5000;
 const int num_ril = 20;
+const float vs = 331.45 + 0.62*20;
 
 #endif

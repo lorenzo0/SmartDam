@@ -3,6 +3,21 @@
 int newOpeningDAM = -1;
 MsgServiceBT msgServiceBLUETOOTH(2,3);
 
+/* 
+ *  Come anticipato in precedenza, la classe scheduler di occupa
+ *  della gestione del servizio bluetooth, istanziato tramite una variabile 
+ *  esterna. Allo stesso momento, lo scheduler deve controllare la presenza di messaggi
+ *  presenti via seriale da sottosistema dam_service.
+ *  
+ *  Viene utilizzata una variabile 'indexCurrentTaskActive' per indicare
+ *  l'indice della task correntemente in esecuzione.
+ *  
+ *    0 --> normal/pre-allarm state
+ *    1 --> allarm state
+ *    2 --> modify state
+ *      
+*/
+
 void Scheduler::init(Led* led_pin){
   nTasks = 0;
   indexCurrentTaskActive = 0;
@@ -20,24 +35,7 @@ bool Scheduler::addTask(Task* task){
   }
 }
 
-/* 
- *  Nella politica di scheduling vengono gestite le interruzioni.
- *  Queste, sono sempre attive ma non sempre prese in considerazione. 
- *  Facendo un esempio forviante, non si può interrompere l'esecuzione del task 
- *  (interazione con bottone BUTTON_STOP) se nel task di IDLE.
- *  
- *  L'interruzione del bottone STOP viene gestita solo nel caso in cui in esecuzione 
- *  è la task numero 3 - running.
- *  L'interruzione del bottone START viene gestita solo nel caso in cui in esecuzione 
- *  è la task numero 0 - idle.
- *  L'interruzione del sensore PIR viene gestita solo nel caso in cui in esecuzione 
- *  è la task numero 2 - sleep.
- *  
- *  Infine, viene presa in considerazione la casistica in cui il task completi la sua
- *  totale esecuzione (data dalle costanti definite in design time), quindi entri in uno stato di completed.
- *  
- *  La variabile 'i' è stata introdotta per rendere il codice più leggibile, sostituendo 'indexCurrentTaskActive'
-*/
+
 void Scheduler::schedule(){
   checkMessageReceivedSERIAL();  
   bluethoot_receiving();   
@@ -45,16 +43,11 @@ void Scheduler::schedule(){
 }
 
 /*
- * Dato che non è possibile fare uno switch analizzando il valore di una stringa,
- * viene strutturato un pattern basato su interi.
- * 
- * Normale o Pre-Allarme (Il loro comportamento è identico, quindi li gestisco
- * in una sola classe) 0
- * Allarme 1
- * Modalità di modifica 2 (Successiva SOLO allo stato allarme
+ * La comunicazione via bluetooth va a collaborare, in modo 
+ * in modo incociato a quella seriale, per definire al meglio gli stati.
+ * Viene stabilito anche qui un pattern di comunicazione tra i due 
+ * sottosistemi.
 */
-
-
 void Scheduler::bluethoot_receiving(){
    if (msgServiceBLUETOOTH.isMsgAvailable()) {
     String messageReceived = msgServiceBLUETOOTH.receiveMsg();
@@ -68,8 +61,20 @@ void Scheduler::bluethoot_receiving(){
   }
 }
 
+/* 
+ *  Viene utilizzato il metodo readStringUntil della classe
+ *  Serial per effettuare uno split del messaggio ricevuto.
+ *  Questo, viene previsto, a seguito di una costruzione di un pattern
+ *  di messaggio tramite seriale tra Service (Servizio) - Controller (Arduino).
+ *  
+ *  Il messaggio ricevuto è così strutturato:
+ *    STATO|Valore percentile apertura diga.
+*/
+
 void Scheduler::checkMessageReceivedSERIAL(){
   if(Serial.available() > 0){
+    led->switchOn();
+    delay(1000);
     String msgReceiveSERIALState, msgReceiveSERIALOpening;
     while (Serial.available() > 0) {
       msgReceiveSERIALState = Serial.readStringUntil('|'); 
@@ -85,15 +90,13 @@ void Scheduler::checkMessageReceivedSERIAL(){
         setNewOpeningDAM(msgReceiveSERIALOpening.toInt());
     }
   }
+  led->switchOff();
 }
 
 void Scheduler::setIndexCurrentTaskActive(int index){
   this->indexCurrentTaskActive = index;
-  Serial.println("Prossima Task in esecuzione: "+ (String) index);
 }
 
 void Scheduler::setNewOpeningDAM(int value){
   newOpeningDAM = value;
-  //Serial.println((String) value + "Setted!");
-  //sarebbe nel log questo
 }
