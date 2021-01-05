@@ -21,8 +21,6 @@ extern int newOpeningDAM;
  * nella variabile newOpeningDAM) in una variabile di tipo double attraverso una
  * proporzione pensata nel file SharingMethod.
  * 
- * Non è possibile però prevedere anche il comportamento presente nella procedura
- * tick nell'oggetto SharingMethod perchè prevede l'utilizzo del servo motore.
 */
 
 AllarmState::AllarmState(int pinLed1, int pinServo){

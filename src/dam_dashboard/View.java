@@ -26,6 +26,7 @@ import java.util.Timer;
 */
 
 public class View implements ActionListener{  
+	JFrame f= new JFrame();  
     JTextField tofill_state, tofill_time, tofill_distance, tofill_angle, tofill_sender;  
     JLabel state, time, distance, angle, sender, welcome_dash;
     Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
@@ -34,7 +35,6 @@ public class View implements ActionListener{
 	DataPoint dp;
 	
     View(){  
-        JFrame f= new JFrame();  
         
         welcome_dash = new JLabel();
         welcome_dash.setText("-- Dasboard Smart Dam --");
@@ -104,18 +104,43 @@ public class View implements ActionListener{
         
         try {
 			dp = request.sendGET();
-			updateFields(dp);
+			updateFields(dp, request.sizeArrayList());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
     }         
     
-    void updateFields(DataPoint dp) {
+    /* 
+     * Questa procedura è stata aggiornata DOPO aver fatto
+     * il video. Nella clip la visibilità dei campi non è 
+     * dettata in tempi dinamici. 
+    */
+    
+    void updateFields(DataPoint dp, boolean sizeArr) throws IOException {
     	if(dp != null) {
+    		if(dp.getState() == "PRE-ALLARM") {
+    			tofill_state.setText(dp.getState());
+    			tofill_distance.setText(Float.toString(dp.getDistance()));
+    			
+    			f.remove(angle);
+    			f.remove(tofill_angle);
+    			
+    			if(sizeArr) {
+	    			GraphData graph = new GraphData();
+	    			graph.generateNewGraph();
+    			}
+    		}else if(dp.getState() == "ALLARM") {
+    			tofill_distance.setText(Float.toString(dp.getDistance()));
+    			tofill_angle.setText(Integer.toString(dp.getDamAngle()));
+    		}else if(dp.getState() == "NORMAL") {
+    			f.remove(angle);
+    			f.remove(tofill_angle);
+    			
+    			f.remove(distance);
+    			f.remove(tofill_distance);
+    		}
 	    	tofill_state.setText(dp.getState());
 	        tofill_time.setText(dp.getTime());
-	        tofill_distance.setText(Float.toString(dp.getDistance()));
-	        tofill_angle.setText(Integer.toString(dp.getDamAngle()));
 	        tofill_sender.setText(dp.getSender());
     	}else {
     		tofill_state.setText("No data...");
@@ -156,7 +181,11 @@ class UpdateInfo extends TimerTask {
     public void requestData() {
     	try {
 			dp = request.sendGET();
-			v.updateFields(dp);
+			if(dp != null)
+				request.sendPOST(true);
+			else
+				request.sendPOST(false);
+			v.updateFields(dp, request.sizeArrayList());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

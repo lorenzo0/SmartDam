@@ -1,7 +1,0 @@
-1. Avviare ngrok su porta 8080
-2. damservice/RunService.java
-3. Avviare RunService.java
-4. damremotehy/comunicazioneHTTP.h
-5. copiare su address quello avviato da ngrok
-6. avviare esp
-7. verificare su indirizzo ngrok se ha ricevuto il messaggio
