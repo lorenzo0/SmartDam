@@ -57,7 +57,7 @@ public class AlertHandler {
                 .setPositiveButton("OK",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                httpRequests.tryHTTPost(spinner.getSelectedItem().toString(), bluetoothConn, context);
+                                httpRequests.tryHTTPost(spinner.getSelectedItem().toString(), bluetoothConn, context, false);
                                 ((Switch)oldView.findViewById(R.id.switch1)).setChecked(false);
                                 httpRequests.tryHTTPGet(context, oldView, bluetoothConn, httpRequests);
                                 Global.mod_op = false;

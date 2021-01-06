@@ -148,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
                             bluetoothConn.sendMessage("MOD-OP");
                             Global.mod_op = true;
                             alerHandler.showAlert(MainActivity.this, currentView, httpRequest, bluetoothConn);
+                            httpRequest.tryHTTPost(Integer.toString(httpRequest.getStorageData().get(0).getAngle()), bluetoothConn, MainActivity.this, true);
                         }else {
                             alerHandler.showNoBTAlert(MainActivity.this);
                             modalitySwitch.setChecked(false);

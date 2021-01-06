@@ -109,7 +109,7 @@ public class HTTPRequest implements Serializable {
         requestQueue.add(jsonObjectRequest);
     }
 
-    public void tryHTTPost(String percentageOpening, Bluetooth bluetooth, Context context){
+    public void tryHTTPost(String percentageOpening, Bluetooth bluetooth, Context context, Boolean modOp){
         RequestQueue requestQueue = Volley.newRequestQueue(context);
         int finalData = Integer.valueOf(percentageOpening.replace("%", ""));
 
@@ -119,6 +119,7 @@ public class HTTPRequest implements Serializable {
             postData.put("state", Global.currentState);
             postData.put("sender", "APP");
             postData.put("open-angle", finalData);
+            postData.put("mod-op", modOp);
 
         } catch (JSONException e) {
             e.printStackTrace();
