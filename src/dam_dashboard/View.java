@@ -27,7 +27,7 @@ import java.util.Timer;
 
 public class View implements ActionListener{  
 	JFrame f= new JFrame();  
-    JTextField tofill_state, tofill_time, tofill_distance, tofill_angle, tofill_sender;  
+    JTextField tofill_state, tofill_time, tofill_distance, tofill_angle, tofill_sender, tofill_modifica;  
     JLabel state, time, distance, angle, sender, welcome_dash;
     Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
     
@@ -45,6 +45,9 @@ public class View implements ActionListener{
         
         tofill_state=new JTextField();  
         tofill_state.setBounds(200,50,150,20); 
+        
+        tofill_modifica=new JTextField();  
+        tofill_modifica.setBounds(200,0,150,20); 
         
         state = new JLabel();
         state.setText("State: ");
@@ -85,6 +88,7 @@ public class View implements ActionListener{
         f.add(tofill_distance);
         f.add(tofill_angle);
         f.add(tofill_sender);
+        f.add(tofill_modifica);
         
         f.add(state);
         f.add(time);
@@ -101,6 +105,7 @@ public class View implements ActionListener{
         tofill_distance.setEditable(false);
         tofill_angle.setEditable(false);
         tofill_sender.setEditable(false);
+        tofill_modifica.setEditable(false);
         
         try {
 			dp = request.sendGET();
@@ -122,8 +127,9 @@ public class View implements ActionListener{
     			tofill_state.setText(dp.getState());
     			tofill_distance.setText(Float.toString(dp.getDistance()));
     			
-    			f.remove(angle);
-    			f.remove(tofill_angle);
+    			tofill_modifica.setVisible(false);
+    			tofill_angle.setVisible(false);
+    			angle.setVisible(false);
     			
     			if(sizeArr) {
 	    			GraphData graph = new GraphData();
@@ -132,12 +138,17 @@ public class View implements ActionListener{
     		}else if(dp.getState() == "ALLARM") {
     			tofill_distance.setText(Float.toString(dp.getDistance()));
     			tofill_angle.setText(Integer.toString(dp.getDamAngle()));
+    			if(dp.getModOp()) {
+    				tofill_modifica.setVisible(true);
+    				tofill_modifica.setText("Stato di modifica ATTIVO!");
+    			}
     		}else if(dp.getState() == "NORMAL") {
-    			f.remove(angle);
-    			f.remove(tofill_angle);
+    			angle.setVisible(false);
+    			tofill_angle.setVisible(false);
+    			tofill_modifica.setVisible(false);
     			
-    			f.remove(distance);
-    			f.remove(tofill_distance);
+    			distance.setVisible(false);
+    			tofill_distance.setVisible(false);
     		}
 	    	tofill_state.setText(dp.getState());
 	        tofill_time.setText(dp.getTime());

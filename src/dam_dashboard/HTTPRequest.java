@@ -20,12 +20,12 @@ public class HTTPRequest {
 	private static final String POST_PARAMS = "{\"sender\": DASHBOARD, \"message\": Dasboard has requested GET data from service }";
 	private static final String POST_PARAMS_NO = "{\"sender\": DASHBOARD, \"message\": Dasboard has requested GET data from service, are there any data? }";
 
-	XYDataset dataSet;
 	boolean size;
 	
 	public DataPoint sendGET() throws IOException {
 		Float distance = 0.0f;
 		String state = "", time = "", sender = "";
+		boolean modOp = false;
 		int angle = 0;
 		size = false;
 		URL obj = new URL(GET_URL);
@@ -57,8 +57,9 @@ public class HTTPRequest {
 					time = array.getJSONObject(0).getString("time");
 					angle = array.getJSONObject(0).getInt("open-angle");
 					sender = array.getJSONObject(0).getString("sender");
+					modOp = array.getJSONObject(0).getBoolean("mod-op");
 					
-					dp = new DataPoint(distance, time, state, angle, sender);
+					dp = new DataPoint(distance, time, state, angle, sender, modOp);
 					return dp;
 					
 			} catch (NumberFormatException e) {
@@ -75,7 +76,7 @@ public class HTTPRequest {
 
 	}
 	
-	public XYDataset sendGETArray() throws IOException {
+	public XYSeriesCollection sendGETArray() throws IOException {
 		Float distance = 0.0f;
 		String state = "", time = "", sender = "";
 		int angle = 0;
@@ -123,10 +124,10 @@ public class HTTPRequest {
 			System.out.println("GET request not worked");
 		}
 		
-		var dataset = new XYSeriesCollection();
-        dataset.addSeries(series);
+		var finalDataset = new XYSeriesCollection();
+        finalDataset.addSeries(series);
 		
-		return dataset;
+		return finalDataset;
 
 	}
 	
